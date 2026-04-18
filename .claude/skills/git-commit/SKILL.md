@@ -30,7 +30,7 @@ Write git commit messages following conventional commits style: capitalized impe
 - <Change 1>
 - <Change 2>
 
-Co-Authored-By: <Model Name> <noreply@anthropic.com>
+Co-Authored-By: <Model Name> (https://github.com/claude)
 ```
 
 A blank line must separate the subject from the body, and the body from the trailer.
@@ -82,5 +82,5 @@ feat(auth): Add password reset functionality
 - Implement email verification flow
 - Add password reset endpoint
 
-Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>
+Co-Authored-By: Claude Opus 4.7 (https://github.com/claude)
 ```
