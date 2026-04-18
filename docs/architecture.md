@@ -9,6 +9,7 @@
     /Auth                    — API key authentication handler and options
     /Controllers             — API controllers (request/response handling)
     /Services                — business logic layer
+    /Repositories            — data access layer (repository interfaces and implementations)
     /Models                  — EF Core entity models
     /DTOs                    — request/response data transfer objects
     /Validators              — FluentValidation validators
@@ -27,7 +28,7 @@ docker-compose.yml           — orchestrates all services (api, db, mcp)
 ### General
 
 - .NET 10 controller-based API
-- 3-layer architecture: **Controller (DTO) → Service (DTO) → DbContext**
+- 3-layer architecture: **Controller (DTO) → Service (DTO) → Repository (Entity) → DbContext**
 - Single-user system — no user authentication/authorization
 - Protected by API key (passed via `X-Api-Key` header)
 - API keys are hashed (HMAC-SHA256 + per-key salt) and stored in the database — never stored as plaintext
@@ -45,12 +46,15 @@ Controller          — receives HTTP requests, works with DTOs, delegates to Se
     ↓
 Service             — business logic, works with DTOs, maps to/from entities
     ↓
-DbContext (EF Core) — data access, works with entity models
+Repository          — data access, works with entity models, delegates to DbContext
+    ↓
+DbContext (EF Core) — ORM / persistence
 ```
 
 - Controllers handle request/response mapping and validation
 - Services contain business logic and DTO ↔ Entity mapping
-- DbContext manages persistence — no repository layer needed for this scope
+- Repositories encapsulate all data access — defined as interfaces, injected into services
+- DbContext is used only inside repository implementations
 
 ### API Key Authentication
 

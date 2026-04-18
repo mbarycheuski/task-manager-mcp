@@ -10,10 +10,9 @@
 ### C# API (`/src/api`)
 
 - Use controller-based API (not minimal API)
-- 3-layer architecture: Controller (DTO) → Service (DTO) → DbContext
+- 3-layer architecture: Controller (DTO) → Service (DTO) → Repository (Entity) → DbContext
 - Controllers only handle HTTP concerns — no business logic
 - Services contain all business logic and DTO ↔ Entity mapping
-- No repository pattern — use DbContext directly in services
 - Use FluentValidation for input validation (not data annotations)
 - Never put secrets in `appsettings.json` — use user secrets or environment variables
 - Use Guid for entity primary keys
