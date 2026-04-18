@@ -53,11 +53,10 @@ Short, lowercase noun for the affected area (`auth`, `api`, `mcp`, `db`). Omit p
 
 ## Writing rules
 
-**Subject:** Capitalized, imperative present tense ("Add" not "Added"),
+- **Subject:** Capitalized, imperative present tense ("Add" not "Added"),
 ~50 chars (hard ceiling ~72), no trailing period. Be specific —
 "Fix bug" is useless; "Handle empty input in tokenizer" is useful.
-
-**Body:** Optional. Wrap at ~72 chars per line. Explain why and provide
+- **Body:** Optional. Wrap at ~72 chars per line. Explain why and provide
 context (not just what changed). Use bullet points or short paragraphs.
 Skip for truly self-explanatory one-liners.
 
