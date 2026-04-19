@@ -1,0 +1,39 @@
+name: task-manager
+
+services:
+  db:
+    container_name: task-manager-db
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-taskmanager}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?error: POSTGRES_PASSWORD not set}"
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  api:
+    container_name: task-manager-api
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=${POSTGRES_DB:-taskmanager};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD}"
+      API_KEY: "${API_KEY:?error: API_KEY not set}"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

@@ -62,14 +62,14 @@ All endpoints require a valid API key in the `X-Api-Key` header. Authentication 
 
 #### ApiKey Model
 
-| Field     | Type     | Description                          |
-|-----------|----------|--------------------------------------|
-| Id        | Guid     | Unique identifier                    |
-| Name      | string   | Label (e.g. "mcp-server")           |
-| KeyHash   | string   | HMAC-SHA256 hash of the raw key      |
-| Salt      | string   | Random per-key salt (base64)         |
-| CreatedAt | DateTime | Auto-set on creation                 |
-| IsActive  | bool     | Soft revocation flag (default: true) |
+| Field      | Type     | Description                          |
+|------------|----------|--------------------------------------|
+| Id         | Guid     | Unique identifier                    |
+| ClientName | string   | Label (e.g. "mcp-server")            |
+| KeyHash    | string   | HMAC-SHA256 hash of the raw key      |
+| Salt       | string   | Random per-key salt (base64)         |
+| CreatedAt  | DateTime | Auto-set on creation                 |
+| IsActive   | bool     | Soft revocation flag (default: true) |
 
 #### Hashing
 
@@ -95,7 +95,7 @@ All endpoints require a valid API key in the `X-Api-Key` header. Authentication 
 #### Seeding
 
 - On startup, if the `ApiKeys` table is empty, the seeder reads `API_KEY` from environment variables
-- Generates a random salt, computes the HMAC-SHA256 hash, and inserts a row with Name="mcp-server"
+- Generates a random salt, computes the HMAC-SHA256 hash, and inserts a row with ClientName="mcp-server"
 - The raw key passes through memory only once at startup — the DB stores only hash + salt
 
 #### Components
