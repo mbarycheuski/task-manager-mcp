@@ -44,7 +44,7 @@ Render as Markdown:
 > [Description citing the specific rule violated]
 > Suggested fix: [Concrete correction]
 
-[Repeat per issue, grouped by file]
+[Repeat per issue, grouped by file. Only include files that have issues — do not list files that are clean.]
 
 ### Verdict
 [APPROVED | APPROVED WITH MINOR NOTES | CHANGES REQUIRED] — [one sentence]

@@ -4,5 +4,5 @@ public enum TaskItemStatus
 {
     None = 0,
     InProgress,
-    Completed
+    Completed,
 }
