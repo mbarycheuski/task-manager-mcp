@@ -50,7 +50,7 @@ Use `run.ps1` from the repo root (requires Docker and a `.env` file — copy `.e
 5. **Verify**
    - *C# API*: run the following from `src/api` and confirm both pass before reporting done:
      ```bash
-     dotnet build
-     dotnet test
+     dotnet build TaskManager.Api.csproj
+     dotnet test TaskManager.Api.csproj
      ```
 6. **Review** — run the `code-reviewer` agent after every change to verify consistency with project patterns, coding standards, and architectural conventions.

@@ -1,6 +1,6 @@
-using TaskManager.Api.Models.Enums;
+using TaskManager.Api.Data.Models.Enums;
 
-namespace TaskManager.Api.Models;
+namespace TaskManager.Api.Data.Models;
 
 public class TaskItem
 {

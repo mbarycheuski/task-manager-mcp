@@ -10,10 +10,11 @@
     /Controllers             — API controllers (request/response handling)
     /Services                — business logic layer
     /Repositories            — data access layer (repository interfaces and implementations)
-    /Models                  — EF Core entity models
     /DTOs                    — request/response data transfer objects
     /Validators              — FluentValidation validators
-    /Data                    — DbContext, migrations, and seeders
+    /Data                    — DbContext, migrations, seeders, and EF configurations
+    /Data/Models             — EF Core entity models
+    /Data/Models/Enums       — Enums used by entity models
     Dockerfile               — API container image
   /mcp                       — Python FastMCP MCP server
     Dockerfile               — MCP server container image
@@ -102,7 +103,7 @@ All endpoints require a valid API key in the `X-Api-Key` header. Authentication 
 
 | Component                     | Location    | Responsibility                                      |
 |-------------------------------|-------------|-----------------------------------------------------|
-| `ApiKey` entity               | Models      | EF Core entity                                      |
+| `ApiKey` entity               | Data        | EF Core entity                                      |
 | `ApiKeyHasher`                | Services    | HMAC-SHA256 hashing and verification                 |
 | `ApiKeyAuthenticationHandler` | Auth        | ASP.NET `AuthenticationHandler` for `X-Api-Key`     |
 | `ApiKeyCacheService`          | Services    | In-memory cache wrapper for validated keys           |

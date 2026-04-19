@@ -25,7 +25,7 @@ namespace TaskManager.Api.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("TaskManager.Api.Models.ApiKey", b =>
+            modelBuilder.Entity("TaskManager.Api.Data.Models.ApiKey", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -62,7 +62,7 @@ namespace TaskManager.Api.Data.Migrations
                     b.ToTable("ApiKeys");
                 });
 
-            modelBuilder.Entity("TaskManager.Api.Models.TaskItem", b =>
+            modelBuilder.Entity("TaskManager.Api.Data.Models.TaskItem", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()

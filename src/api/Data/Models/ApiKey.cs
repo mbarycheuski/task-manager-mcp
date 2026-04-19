@@ -1,4 +1,4 @@
-namespace TaskManager.Api.Models;
+namespace TaskManager.Api.Data.Models;
 
 public class ApiKey
 {
