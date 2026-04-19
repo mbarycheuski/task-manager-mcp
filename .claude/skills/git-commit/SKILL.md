@@ -30,8 +30,7 @@ Write git commit messages following conventional commits style: capitalized impe
 - <Change 1>
 - <Change 2>
 
-Co-Authored-By: <Model Name> (https://github.com/claude)
-```
+Co-Authored-By: <Model Name> <noreply@anthropic.com>
 
 A blank line must separate the subject from the body, and the body from the trailer.
 
