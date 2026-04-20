@@ -10,8 +10,8 @@ using TaskManager.Api.Data;
 
 namespace TaskManager.Api.Data.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(TaskDbContext))]
+    partial class TaskDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {

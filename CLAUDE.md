@@ -28,9 +28,15 @@ Use `run.ps1` from the repo root (requires Docker and a `.env` file — copy `.e
 - Never put secrets in `appsettings.json` — use user secrets or environment variables
 - Use Guid for entity primary keys
 - Use primary constructors for all classes
+- Initialize required `string` properties on EF Core entities with `null!` (not `string.Empty`) — EF Core guarantees these are set on materialization
 - Use `record` for all DTOs
 - In enums, only set an explicit value on the first member
 - Place `using` directives before the `namespace` declaration (not inside it)
+- Name parameters after their type in camelCase (e.g. `CreateTaskRequest createTaskRequest`, `CancellationToken cancellationToken`); short conventional names like `id`, `entity`, `status` are fine
+- Always validate input arguments at the start of every public method (including static and extension methods): use `ArgumentNullException.ThrowIfNull` for reference types, and `ArgumentOutOfRangeException.ThrowIfEqual` for invalid values (e.g. `Guid.Empty`); value types and nullable value types where `null` is a valid input do not need a null check
+- Always add a blank line before `return` statements
+- Use `TimeProvider` (injected via DI) instead of `DateTime.UtcNow` directly
+- Use `SingleOrDefaultAsync` (not `FirstOrDefaultAsync`) when querying by unique identifier — signals intent and throws on unexpected duplicates
 
 ### Python MCP Server (`/src/mcp`)
 
@@ -48,7 +54,7 @@ Use `run.ps1` from the repo root (requires Docker and a `.env` file — copy `.e
    - *Python MCP*: add or update the tool, ensuring it calls the C# API over HTTP.
 4. **Update docs** — if the change adds or modifies an endpoint or tool, update `docs/architecture.md`.
 5. **Verify**
-   - *C# API*: run the following from `src/api` and confirm both pass before reporting done:
+   - *C# API*: run the following from `src/api/TaskManager.Api` and confirm both pass before reporting done:
      ```bash
      dotnet build TaskManager.Api.csproj
      dotnet test TaskManager.Api.csproj

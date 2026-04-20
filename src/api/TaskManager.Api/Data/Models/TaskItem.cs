@@ -5,10 +5,10 @@ namespace TaskManager.Api.Data.Models;
 public class TaskItem
 {
     public Guid Id { get; set; }
-    public string Title { get; set; } = string.Empty;
+    public string Title { get; set; } = null!;
     public string? Notes { get; set; }
     public TaskPriority? Priority { get; set; }
-    public TaskItemStatus Status { get; set; } = TaskItemStatus.None;
+    public TaskItemStatus Status { get; set; }
     public DateOnly? DueDate { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }

@@ -3,7 +3,7 @@ using TaskManager.Api.Data.Models;
 
 namespace TaskManager.Api.Data;
 
-public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+public class TaskDbContext(DbContextOptions<TaskDbContext> options) : DbContext(options)
 {
     public DbSet<TaskItem> Tasks => Set<TaskItem>();
     public DbSet<ApiKey> ApiKeys => Set<ApiKey>();
@@ -11,6 +11,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(TaskDbContext).Assembly);
     }
 }
