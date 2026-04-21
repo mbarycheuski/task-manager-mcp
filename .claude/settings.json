@@ -11,6 +11,18 @@
     ]
   },
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "grep -q '\"file_path\":\"[^\"]*\\.env\"' <<< \"$(cat)\" && echo '{\"continue\": false, \"stopReason\": \"Cannot read .env file\"}' || true",
+            "statusMessage": "Checking for .env file..."
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Write|Edit",
