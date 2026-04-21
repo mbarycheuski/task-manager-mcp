@@ -2,23 +2,24 @@
 
 ## Overview
 
-A single-user task management system consisting of two components:
+A single-user task management system consisting of two components, both C# .NET 10 projects in a single `src/TaskManager.slnx` solution:
 
-1. **C# .NET 10 CRUD API** — backend REST API with PostgreSQL storage
-2. **Python FastMCP Server** — MCP (Model Context Protocol) server that connects LLM to the API
+1. **TaskManager.Api** — backend REST API with PostgreSQL storage
+2. **TaskManager.Mcp** — MCP (Model Context Protocol) server that exposes the API to LLM clients
 
 ## Tech Stack Summary
 
-| Component      | Technology                          |
-|----------------|-------------------------------------|
-| API            | C# / .NET 10                       |
-| ORM            | Entity Framework Core               |
-| Database       | PostgreSQL                          |
-| Validation     | FluentValidation                    |
-| API Docs       | Swagger / Swashbuckle               |
-| MCP Server     | Python / FastMCP                    |
-| API Client     | httpx or requests (Python)          |
-| Infrastructure | Docker / Docker Compose             |
+| Component        | Technology                                        |
+|------------------|---------------------------------------------------|
+| API              | C# / .NET 10 (controller-based ASP.NET Core)      |
+| ORM              | Entity Framework Core                             |
+| Database         | PostgreSQL                                        |
+| Validation       | FluentValidation                                  |
+| API Docs         | Swagger / Swashbuckle                             |
+| MCP Server       | C# / .NET 10 (`ModelContextProtocol.AspNetCore`)  |
+| MCP Transport    | Streamable HTTP, stateless mode                   |
+| API Client (MCP) | `IHttpClientFactory` typed client (HttpClient)    |
+| Infrastructure   | Docker / Docker Compose                           |
 
 ## Business Requirements
 

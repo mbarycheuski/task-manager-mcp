@@ -5,81 +5,86 @@
 ```
 /docs                        — project documentation
 /src
-  /api                       — C# .NET 10 CRUD API
-    /Auth                    — API key authentication handler, hasher, cache service, and defaults
-    /Common                  — shared services (e.g. TimeService)
-    /Contracts               — request/response contract types
+  TaskManager.slnx           — solution file (both projects)
+  /TaskManager.Api           — C# .NET 10 CRUD API
+    /Auth                    — API key authentication handler, hasher, cache service
+    /Common                  — shared services (TimeService)
+    /Contracts               — request/response contract records
     /Contracts/Enums         — enums used in contracts
-    /Controllers             — API controllers (request/response handling)
-    /Data                    — DbContext, migrations, seeders, and EF configurations
+    /Controllers             — API controllers
+    /Data                    — DbContext, migrations, seeders, EF configurations
     /Data/Configurations     — EF Core entity configurations
     /Data/Migrations         — EF Core migrations
     /Data/Models             — EF Core entity models
     /Data/Models/Enums       — enums used by entity models
-    /Exceptions              — custom exception types (NotFoundException, BusinessException)
+    /Exceptions              — NotFoundException, BusinessException
     /Exceptions/Handlers     — global IExceptionHandler implementations
-    /Mappers                 — entity-to-contract mapping extensions
+    /Mappers                 — entity ↔ contract mapping extensions
     /OpenApi                 — Swagger/OpenAPI customizations
-    /Repositories            — data access layer (repository interfaces and implementations)
+    /Repositories            — repository interfaces and implementations
     /Services                — business logic layer
     /Settings                — strongly-typed configuration classes
     /Validators              — FluentValidation validators
-    Dockerfile               — API container image
-  /mcp                       — Python FastMCP MCP server
-    Dockerfile               — MCP server container image
-docker-compose.yml           — orchestrates all services (api, db, mcp)
-.env                         — secrets injected into containers (excluded from git)
+    Dockerfile
+  /TaskManager.Mcp           — C# .NET 10 MCP server (ModelContextProtocol.AspNetCore)
+    /Tools                   — [McpServerToolType] / [McpServerTool]
+    /Resources               — [McpServerResourceType] / [McpServerResource]
+    /Prompts                 — [McpServerPromptType] / [McpServerPrompt]
+    /Services                — orchestration layer (no MCP or HTTP concerns)
+    /Collaborators           — typed HttpClient wrappers for TaskManager.Api
+    /Contracts               — MCP-facing request/response records
+    /Settings                — strongly-typed configuration (API base URL, API key)
+    Dockerfile
+docker-compose.yml           — api, db, mcp services
+.env                         — secrets injected into containers (git-ignored)
 ```
 
 ---
 
-## API (C# .NET 10)
+## API (TaskManager.Api)
 
-### General
-
-- .NET 10 controller-based API
-- 3-layer architecture: **Controller (Contract) → Service (Contract) → Repository (Entity) → DbContext**
-- Single-user system — no user authentication/authorization
-- Protected by API key (passed via `X-Api-Key` header)
-- API keys are hashed (HMAC-SHA256 + per-key salt) and stored in the database — never stored as plaintext
-- Validated keys are cached in-memory to avoid DB hits on every request
-- Default API key is seeded on first startup from the `API_KEY` environment variable
-- Swagger UI enabled, supporting API key input for testing
-- Input validation via FluentValidation
-
-### Architecture
+### Layer Flow
 
 ```
-X-Api-Key header    — validated by ApiKeyAuthenticationHandler (with in-memory cache)
+X-Api-Key header → ApiKeyAuthenticationHandler (in-memory cache)
     ↓
-Controller          — receives HTTP requests, works with DTOs, delegates to Service
+Controller  — HTTP concerns, FluentValidation auto-validates requests
     ↓
-Service             — business logic, works with DTOs, maps to/from entities
+Service     — business logic, Contract ↔ Entity mapping via /Mappers
     ↓
-Repository          — data access, works with entity models, delegates to DbContext
+Repository  — data access via EF Core
     ↓
-DbContext (EF Core) — ORM / persistence
+DbContext
 ```
 
-- Controllers handle routing and HTTP concerns; FluentValidation auto-validates requests
-- Services contain business logic; Contract ↔ Entity mapping is done via extension methods in `/Mappers`
-- Repositories encapsulate all data access — defined as interfaces, injected into services
-- DbContext is used only inside repository implementations
+### Task Model
+
+| Field       | Type      | Notes                                           |
+|-------------|-----------|-------------------------------------------------|
+| Id          | Guid      |                                                 |
+| Title       | string    | Required, max 255 chars                         |
+| Notes       | string?   | Max 4000 chars                                  |
+| Priority    | enum?     | Low, Medium, High, Critical                     |
+| Status      | enum      | None, InProgress, Completed                     |
+| DueDate     | DateOnly? |                                                 |
+| CreatedAt   | DateTime  | Server-set                                      |
+| UpdatedAt   | DateTime  | Server-set                                      |
+| CompletedAt | DateTime? | Set on transition to Completed                  |
 
 ### API Key Authentication
 
-All endpoints require a valid API key in the `X-Api-Key` header. Authentication uses ASP.NET Core's authentication pipeline via a custom `AuthenticationHandler`.
+All endpoints require a valid API key in the `X-Api-Key` header via a custom ASP.NET Core `AuthenticationHandler`.
 
 #### ApiKey Model
 
-| Field      | Type     | Description                          |
-|------------|----------|--------------------------------------|
-| Id         | Guid     | Unique identifier                    |
-| ClientName | string   | Label (e.g. "mcp-server")            |
-| KeyHash    | string   | HMAC-SHA256 hash of the raw key      |
-| Salt       | string   | Random per-key salt (base64)         |
-| CreatedAt  | DateTime | Auto-set on creation                 |
-| IsActive   | bool     | Soft revocation flag (default: true) |
+| Field      | Type     | Notes                                  |
+|------------|----------|----------------------------------------|
+| Id         | Guid     |                                        |
+| ClientName | string   | e.g. "mcp-server"                      |
+| KeyHash    | string   | HMAC-SHA256(key: salt, msg: rawApiKey) |
+| Salt       | string   | Random per-key salt (base64)           |
+| CreatedAt  | DateTime |                                        |
+| IsActive   | bool     | Soft revocation (default: true)        |
 
 #### Hashing
 
@@ -97,110 +102,92 @@ All endpoints require a valid API key in the `X-Api-Key` header. Authentication 
 
 #### Caching
 
-- Uses `IMemoryCache` to avoid DB queries on every request
 - Cache key: SHA-256 of the incoming raw key (raw key is never stored in cache)
 - Sliding expiration: 30 minutes
-- Cache is invalidated naturally via TTL — acceptable for a single-user system
 
 #### Seeding
 
-- On startup, if the `ApiKeys` table is empty, the seeder reads `API_KEY` from environment variables
-- Generates a random salt, computes the HMAC-SHA256 hash, and inserts a row with ClientName="mcp-server"
-- The raw key passes through memory only once at startup — the DB stores only hash + salt
-
-#### Components
-
-| Component                     | Location    | Responsibility                                      |
-|-------------------------------|-------------|-----------------------------------------------------|
-| `ApiKey` entity               | Data        | EF Core entity                                      |
-| `ApiKeyHasher`                | Auth        | HMAC-SHA256 hashing and verification                 |
-| `ApiKeyAuthenticationHandler` | Auth        | ASP.NET `AuthenticationHandler` for `X-Api-Key`     |
-| `ApiKeyCacheService`          | Auth        | In-memory cache wrapper for validated keys           |
-| `ApiKeySeeder`                | Data        | Seeds default key on first startup from env var      |
-
-### Data Storage
-
-- PostgreSQL database
-- Entity Framework Core as the ORM
-
-### Task Model
-
-| Field       | Type       | Description                                      |
-|-------------|------------|--------------------------------------------------|
-| Id          | Guid       | Unique identifier                                |
-| Title       | string     | Task title (required, max 255 chars)             |
-| Notes       | string?    | Optional notes (max 4000 chars)                  |
-| Priority    | enum?      | Optional priority (Low, Medium, High, Critical)  |
-| Status      | enum       | None, InProgress, Completed                      |
-| DueDate     | DateOnly?  | Optional due date (date only, no time component) |
-| CreatedAt   | DateTime   | Auto-set on creation                             |
-| UpdatedAt   | DateTime   | Auto-set on update                               |
-| CompletedAt | DateTime?  | Set when task is moved to Completed              |
+- On startup, if the `ApiKeys` table is empty, reads `API_KEY` from environment variables
+- Generates a random salt, computes the HMAC-SHA256 hash, inserts a row with `ClientName="mcp-server"`
+- The raw key passes through memory only once — the DB stores only hash + salt
 
 ### Endpoints
 
-| Method | Route              | Description                |
-|--------|--------------------|----------------------------|
-| GET    | /api/tasks         | Get tasks (with filters)   |
-| GET    | /api/tasks/{id}    | Get a single task          |
-| POST   | /api/tasks         | Create a new task          |
-| PUT    | /api/tasks/{id}    | Update an existing task    |
-| DELETE | /api/tasks/{id}    | Delete a task              |
+| Method | Route           | Description              |
+|--------|-----------------|--------------------------|
+| GET    | /api/tasks      | List tasks (with filters)|
+| GET    | /api/tasks/{id} | Get a single task        |
+| POST   | /api/tasks      | Create a task            |
+| PUT    | /api/tasks/{id} | Update a task            |
+| DELETE | /api/tasks/{id} | Delete a task            |
 
-### Query Filters for GET /api/tasks
-
-All filters are optional and can be combined:
-
-| Parameter  | Type       | Description                                              |
-|------------|------------|----------------------------------------------------------|
-| status     | enum?      | Filter by status (None, InProgress, Completed)           |
-| priority   | enum?      | Filter by priority (Low, Medium, High, Critical)         |
-| dueDateFrom| DateOnly?  | Tasks with due date on or after this date (ISO 8601)     |
-| dueDateTo  | DateOnly?  | Tasks with due date on or before this date (ISO 8601)    |
+Query filter parameters for `GET /api/tasks`: `status`, `priority`, `dueDateFrom`, `dueDateTo` (all optional).
 
 ---
 
-## MCP Server (Python FastMCP)
+## MCP Server (TaskManager.Mcp)
 
-The MCP server acts as a bridge between Claude Code and the Task Manager API.
+Streamable HTTP transport, stateless mode. Bridges MCP clients to TaskManager.Api.
+
+### Layer Flow
+
+```
+MCP Client → Streamable HTTP (POST / SSE)
+    ↓
+Tool / Resource / Prompt  — MCP surface: attribute binding, parameter parsing
+    ↓
+Service                   — orchestration; no MCP types, no HttpClient
+    ↓
+Collaborator              — typed HttpClient; X-Api-Key set once at DI registration
+    ↓
+HttpClient → TaskManager.Api (REST)
+```
 
 ### Tools
 
-Tools are functions that call the API:
-
-| Tool             | Description              |
-|------------------|--------------------------|
-| `get_task`       | Get a single task by ID  |
-| `get_all_tasks`  | Get all tasks            |
-| `add_task`       | Create a new task        |
-| `update_task`    | Update an existing task  |
-| `delete_task`    | Delete a task            |
+| Tool            | Description                                          | API Call               |
+|-----------------|------------------------------------------------------|------------------------|
+| `get_task`      | Get a single task by ID                              | GET /api/tasks/{id}    |
+| `get_all_tasks` | List tasks with optional filters                     | GET /api/tasks         |
+| `add_task`      | Create a new task                                    | POST /api/tasks        |
+| `update_task`   | Update an existing task                              | PUT /api/tasks/{id}    |
+| `delete_task`   | Delete a task                                        | DELETE /api/tasks/{id} |
 
 ### Resources
 
-Resources provide structured read access to data:
-
-| URI                    | Description                 | API Call                                           |
-|------------------------|-----------------------------|----------------------------------------------------|
-| `tasks://all`          | All tasks                   | `GET /api/tasks`                                   |
-| `tasks://completed`    | Completed tasks             | `GET /api/tasks?status=Completed`                  |
-| `tasks://today`        | Tasks due today             | `GET /api/tasks?dueDateFrom={today}&dueDateTo={today}` (MCP server resolves `today` to ISO date, e.g. `2026-04-18`) |
-| `tasks://in-progress`  | Tasks currently in progress | `GET /api/tasks?status=InProgress`                 |
+| URI                   | API Call                                                        |
+|-----------------------|-----------------------------------------------------------------|
+| `tasks://all`         | GET /api/tasks                                                  |
+| `tasks://completed`   | GET /api/tasks?status=Completed                                 |
+| `tasks://in-progress` | GET /api/tasks?status=InProgress                                |
+| `tasks://today`       | GET /api/tasks?dueDateFrom={today}&dueDateTo={today}            |
 
 ### Prompts
 
-Prompts are commands Claude can invoke:
+| Prompt             | Description                                               |
+|--------------------|-----------------------------------------------------------|
+| `daily-plan`       | Top 3 highest-priority tasks due today                    |
+| `prioritize-tasks` | Reviews open tasks and suggests a prioritized order       |
 
-| Prompt               | Description                                              |
-|----------------------|----------------------------------------------------------|
-| `/daily-plan`        | Gets the top 3 highest-priority tasks due today          |
-| `/prioritize-tasks`  | Reviews open tasks and suggests a prioritized order      |
+### Configuration
 
-### Design Principles
+| Variable         | Description                                        | Example               |
+|------------------|----------------------------------------------------|-----------------------|
+| `API_BASE_URL`   | Base URL of TaskManager.Api inside compose network | `http://api:8080`     |
+| `API_KEY`        | Raw API key, forwarded as `X-Api-Key`              | *(from `.env`)*       |
+| `ASPNETCORE_URLS`| MCP server bind URL inside the container           | `http://0.0.0.0:8080` |
 
-- The MCP server must be easy for AI to use and understand
-- Clear tool descriptions and parameter documentation
-- Structured responses that Claude can reason about
+### Client Registration
+
+```jsonc
+{
+  "mcpServers": {
+    "task-manager": {
+      "url": "http://localhost:5050/mcp"
+    }
+  }
+}
+```
 
 ---
 
