@@ -73,12 +73,13 @@ if ($Down) {
 }
 
 Write-Host ""
-Write-Host "+----------------------+----------+------------------------------------------+"
-Write-Host "| Container            | Type     | Link                                     |"
-Write-Host "+----------------------+----------+------------------------------------------+"
-Write-Host "| task-manager-db      | Postgres |                                          |"
-Write-Host "| task-manager-api     | .NET API | http://localhost:8080/docs (Swagger UI)  |"
-Write-Host "+----------------------+----------+------------------------------------------+"
+Write-Host "+----------------------+-------------+------------------------------------------+"
+Write-Host "| Container            | Type        | Link                                     |"
+Write-Host "+----------------------+-------------+------------------------------------------+"
+Write-Host "| task-manager-db      | Postgres    |                                          |"
+Write-Host "| task-manager-api     | .NET API    | http://localhost:8080/docs (Swagger UI)  |"
+Write-Host "| task-manager-mcp     | MCP Server  | http://localhost:5050/mcp                |"
+Write-Host "+----------------------+-------------+------------------------------------------+"
 Write-Host ""
 
 if ($Build) {
