@@ -6,15 +6,24 @@
 /docs                        — project documentation
 /src
   /api                       — C# .NET 10 CRUD API
-    /Auth                    — API key authentication handler and options
+    /Auth                    — API key authentication handler, hasher, cache service, and defaults
+    /Common                  — shared services (e.g. TimeService)
+    /Contracts               — request/response contract types
+    /Contracts/Enums         — enums used in contracts
     /Controllers             — API controllers (request/response handling)
-    /Services                — business logic layer
-    /Repositories            — data access layer (repository interfaces and implementations)
-    /DTOs                    — request/response data transfer objects
-    /Validators              — FluentValidation validators
     /Data                    — DbContext, migrations, seeders, and EF configurations
+    /Data/Configurations     — EF Core entity configurations
+    /Data/Migrations         — EF Core migrations
     /Data/Models             — EF Core entity models
-    /Data/Models/Enums       — Enums used by entity models
+    /Data/Models/Enums       — enums used by entity models
+    /Exceptions              — custom exception types (NotFoundException, BusinessException)
+    /Exceptions/Handlers     — global IExceptionHandler implementations
+    /Mappers                 — entity-to-contract mapping extensions
+    /OpenApi                 — Swagger/OpenAPI customizations
+    /Repositories            — data access layer (repository interfaces and implementations)
+    /Services                — business logic layer
+    /Settings                — strongly-typed configuration classes
+    /Validators              — FluentValidation validators
     Dockerfile               — API container image
   /mcp                       — Python FastMCP MCP server
     Dockerfile               — MCP server container image
@@ -29,7 +38,7 @@ docker-compose.yml           — orchestrates all services (api, db, mcp)
 ### General
 
 - .NET 10 controller-based API
-- 3-layer architecture: **Controller (DTO) → Service (DTO) → Repository (Entity) → DbContext**
+- 3-layer architecture: **Controller (Contract) → Service (Contract) → Repository (Entity) → DbContext**
 - Single-user system — no user authentication/authorization
 - Protected by API key (passed via `X-Api-Key` header)
 - API keys are hashed (HMAC-SHA256 + per-key salt) and stored in the database — never stored as plaintext
@@ -52,8 +61,8 @@ Repository          — data access, works with entity models, delegates to DbCo
 DbContext (EF Core) — ORM / persistence
 ```
 
-- Controllers handle request/response mapping and validation
-- Services contain business logic and DTO ↔ Entity mapping
+- Controllers handle routing and HTTP concerns; FluentValidation auto-validates requests
+- Services contain business logic; Contract ↔ Entity mapping is done via extension methods in `/Mappers`
 - Repositories encapsulate all data access — defined as interfaces, injected into services
 - DbContext is used only inside repository implementations
 
@@ -104,9 +113,9 @@ All endpoints require a valid API key in the `X-Api-Key` header. Authentication 
 | Component                     | Location    | Responsibility                                      |
 |-------------------------------|-------------|-----------------------------------------------------|
 | `ApiKey` entity               | Data        | EF Core entity                                      |
-| `ApiKeyHasher`                | Services    | HMAC-SHA256 hashing and verification                 |
+| `ApiKeyHasher`                | Auth        | HMAC-SHA256 hashing and verification                 |
 | `ApiKeyAuthenticationHandler` | Auth        | ASP.NET `AuthenticationHandler` for `X-Api-Key`     |
-| `ApiKeyCacheService`          | Services    | In-memory cache wrapper for validated keys           |
+| `ApiKeyCacheService`          | Auth        | In-memory cache wrapper for validated keys           |
 | `ApiKeySeeder`                | Data        | Seeds default key on first startup from env var      |
 
 ### Data Storage

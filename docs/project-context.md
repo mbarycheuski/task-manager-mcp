@@ -79,7 +79,9 @@ A single-user task management system consisting of two components:
 
 ## Security
 
-- API key is required for all API requests
-- API key is stored in .NET user secrets (development) or environment variables (production)
-- API key is **never** committed to source control or placed in `appsettings.json`
-- MCP server reads the API key from environment variables
+- All API endpoints require a valid API key in the `X-Api-Key` header
+- API keys are hashed (HMAC-SHA256 + random per-key salt) and stored in the database — never stored as plaintext
+- On first startup, if the `ApiKeys` table is empty, the seeder reads the raw key from the `API_KEY` environment variable, hashes it, and inserts a record; the raw key is never persisted
+- Validated keys are cached in-memory (sliding 30-minute TTL) to avoid DB hits on every request
+- API keys are **never** committed to source control or placed in `appsettings.json`
+- MCP server reads the raw API key from environment variables

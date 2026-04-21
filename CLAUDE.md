@@ -33,10 +33,11 @@ Use `run.ps1` from the repo root (requires Docker and a `.env` file — copy `.e
 - In enums, only set an explicit value on the first member
 - Place `using` directives before the `namespace` declaration (not inside it)
 - Name parameters after their type in camelCase (e.g. `CreateTaskRequest createTaskRequest`, `CancellationToken cancellationToken`); short conventional names like `id`, `entity`, `status` are fine
-- Always validate input arguments at the start of every public method (including static and extension methods): use `ArgumentNullException.ThrowIfNull` for reference types, and `ArgumentOutOfRangeException.ThrowIfEqual` for invalid values (e.g. `Guid.Empty`); value types and nullable value types where `null` is a valid input do not need a null check
+- Always validate input arguments at the start of every public method (including static and extension methods): use `ArgumentException.ThrowIfNullOrWhiteSpace` for `string` parameters, `ArgumentNullException.ThrowIfNull` for other reference types, and `ArgumentOutOfRangeException.ThrowIfEqual` for invalid values (e.g. `Guid.Empty`); value types and nullable value types where `null` is a valid input do not need a null check
 - Always add a blank line before `return` statements
 - Use `TimeProvider` (injected via DI) instead of `DateTime.UtcNow` directly
 - Use `SingleOrDefaultAsync` (not `FirstOrDefaultAsync`) when querying by unique identifier — signals intent and throws on unexpected duplicates
+- Never inject `DbContext` directly outside of Repository and Seeder classes — all other classes must go through a repository interface
 
 ### Python MCP Server (`/src/mcp`)
 

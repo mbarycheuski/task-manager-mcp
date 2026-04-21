@@ -8,4 +8,7 @@ public class AppSettings
 
     [Required]
     public required string Timezone { get; init; }
+
+    [Required]
+    public required TimeSpan ApiKeyCacheSlidingExpiration { get; init; }
 }
