@@ -27,13 +27,19 @@
     /Validators              — FluentValidation validators
     Dockerfile
   /TaskManager.Mcp           — C# .NET 10 MCP server (ModelContextProtocol.AspNetCore)
-    /Tools                   — [McpServerToolType] / [McpServerTool]
-    /Resources               — [McpServerResourceType] / [McpServerResource]
-    /Prompts                 — [McpServerPromptType] / [McpServerPrompt]
-    /Services                — orchestration layer (no MCP or HTTP concerns)
     /Collaborators           — typed HttpClient wrappers for TaskManager.Api
-    /Contracts               — MCP-facing request/response records
+    /Collaborators/Dto       — DTOs mirroring API JSON response shapes
+    /Common                  — shared services (ITimeService)
+    /Inputs                  — input parameter types for tools/resources
+    /Mappers                 — type mapping extensions (Dto → Output, etc.)
+    /Outputs                 — output types returned to MCP clients
+    /Prompts                 — [McpServerPromptType] / [McpServerPrompt]
+    /Resources               — [McpServerResourceType] / [McpServerResource]
+    /Services                — orchestration layer (no MCP or HTTP concerns)
     /Settings                — strongly-typed configuration (API base URL, API key)
+    /Tools                   — [McpServerToolType] / [McpServerTool]
+    /Utilities               — helper utilities (serializers, constants, validators)
+    /Utilities/Serializers   — JSON and custom serialization logic
     Dockerfile
 docker-compose.yml           — api, db, mcp services
 .env                         — secrets injected into containers (git-ignored)
@@ -134,33 +140,44 @@ Streamable HTTP transport, stateless mode. Bridges MCP clients to TaskManager.Ap
 ```
 MCP Client → Streamable HTTP (POST / SSE)
     ↓
-Tool / Resource / Prompt  — MCP surface: attribute binding, parameter parsing
+Tool / Resource                    — MCP surface: attribute binding, input parameter parsing
     ↓
-Service                   — orchestration; no MCP types, no HttpClient
+Service                            — orchestration: Dto ↔ Output mapping, business logic
     ↓
-Collaborator              — typed HttpClient; X-Api-Key set once at DI registration
+Collaborator                       — typed HttpClient; X-Api-Key set once at DI registration
     ↓
-HttpClient → TaskManager.Api (REST)
+HttpClient → TaskManager.Api (REST) → returns Dto
+    ↓
+Mapper (Dto → Output)             — TaskItemMappingExtensions converts collaborator DTOs to output types
+    ↓
+Tool / Resource returns Output    — MCP client receives Output types
 ```
+
+### Types and Flow
+
+- **Inputs** (`/Inputs/CreateTaskInput`, etc.) — parameter types for tool methods; bound from MCP request attributes
+- **Dto** (`/Collaborators/Dto/`) — JSON shapes matching API responses; mapped from HTTP responses
+- **Outputs** (`/Outputs/TaskItem`, etc.) — types returned to MCP clients; structured content + schema
+- **Mappers** (`/Mappers/TaskItemMappingExtensions`) — convert Dto → Output; called by Service layer before returning to tools/resources
 
 ### Tools
 
-| Tool            | Description                                          | API Call               |
-|-----------------|------------------------------------------------------|------------------------|
-| `get_task`      | Get a single task by ID                              | GET /api/tasks/{id}    |
-| `get_all_tasks` | List tasks with optional filters                     | GET /api/tasks         |
-| `add_task`      | Create a new task                                    | POST /api/tasks        |
-| `update_task`   | Update an existing task                              | PUT /api/tasks/{id}    |
-| `delete_task`   | Delete a task                                        | DELETE /api/tasks/{id} |
+| Tool            | Description                          | API Call               | Status       |
+|-----------------|--------------------------------------|------------------------|--------------|
+| `get_all_tasks` | List all tasks                       | GET /api/tasks         | ✅ Implemented |
+| `get_task`      | Get a single task by ID              | GET /api/tasks/{id}    | ✅ Implemented |
+| `add_task`      | Create a new task                    | POST /api/tasks        | ✅ Implemented |
+| `update_task`   | Update an existing task              | PUT /api/tasks/{id}    | ✅ Implemented |
+| `delete_task`   | Delete a task                        | DELETE /api/tasks/{id} | ✅ Implemented |
 
 ### Resources
 
-| URI                   | API Call                                                        |
-|-----------------------|-----------------------------------------------------------------|
-| `tasks://all`         | GET /api/tasks                                                  |
-| `tasks://completed`   | GET /api/tasks?status=Completed                                 |
-| `tasks://in-progress` | GET /api/tasks?status=InProgress                                |
-| `tasks://today`       | GET /api/tasks?dueDateFrom={today}&dueDateTo={today}            |
+| URI                   | API Call                                                        | Status         |
+|-----------------------|-----------------------------------------------------------------|----------------|
+| `tasks://all`         | GET /api/tasks                                                  | ✅ Implemented |
+| `tasks://completed`   | GET /api/tasks?status=Completed                                 | ✅ Implemented |
+| `tasks://in-progress` | GET /api/tasks?status=InProgress                                | ✅ Implemented |
+| `tasks://today`       | GET /api/tasks?dueDateFrom={today}&dueDateTo={today}            | ✅ Implemented |
 
 ### Prompts
 
@@ -183,7 +200,8 @@ HttpClient → TaskManager.Api (REST)
 {
   "mcpServers": {
     "task-manager": {
-      "url": "http://localhost:5050/mcp"
+      "type": "http",
+      "url": "http://localhost:5050"
     }
   }
 }

@@ -50,5 +50,17 @@ services:
     depends_on:
       - api
 
+  mcp-inspector:
+    container_name: task-manager-mcp-inspector
+    image: ghcr.io/modelcontextprotocol/inspector:latest
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:6274:6274"
+      - "127.0.0.1:6277:6277"
+    environment:
+      HOST: "0.0.0.0"
+      MCP_AUTO_OPEN_ENABLED: "false"
+      MCP_PROXY_AUTH_TOKEN: "${MCP_PROXY_AUTH_TOKEN:?error: MCP_PROXY_AUTH_TOKEN not set}"
+
 volumes:
   pgdata:

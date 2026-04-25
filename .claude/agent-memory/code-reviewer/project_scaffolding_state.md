@@ -1,21 +1,25 @@
 ---
-name: Project current state
-description: Current implementation state of the Task Manager API — all layers and components that exist as of the API key authentication changeset
+name: Project implementation state
+description: Current implementation state of both projects as of the TaskManager.Mcp full implementation changeset
 type: project
 ---
 
-As of the API key authentication changeset (2026-04-21), the following layers are fully implemented:
+As of the TaskManager.Mcp full-implementation changeset (2026-04-25), both projects are substantially implemented.
 
-- **Controllers** — `TasksController` (all CRUD endpoints, `[Authorize]` applied)
+**TaskManager.Api** — fully implemented: Auth, Controllers, Services, Repositories, Mappers, Validators, Exceptions, EF Core Data layer with migrations and seeder. See prior memory content for detailed layer inventory.
+
+**TaskManager.Mcp** — fully implemented:
+- **Tools** — `TaskTools` (get_all_tasks, get_task, add_task, update_task, delete_task)
+- **Resources** — `TaskResources` (tasks://all, tasks://completed, tasks://in-progress, tasks://today, tasks://{id})
 - **Services** — `ITaskService` / `TaskService`
-- **Repositories** — `ITaskRepository` / `TaskRepository`, `IApiKeyRepository` / `ApiKeyRepository`
-- **Data** — `TaskDbContext`, `ApiKeySeeder`, entity models (`TaskItem`, `ApiKey`)
-- **Auth** — `ApiKeyAuthenticationHandler`, `ApiKeyCacheService`, `IApiKeyCacheService`, `ApiKeyDefaults`, `ApiKeyHasher`, `IApiKeyHasher` (note: architecture.md places `ApiKeyHasher` and `ApiKeyCacheService` in `Services` folder, but code puts them in `Auth` folder)
-- **Common/Utils** — `TimeService`, `ITimeService`
-- **Contracts** — request/response record types in `/Contracts` namespace; contract enums in `/Contracts/Enums`; note types use names like `TaskItem`, `CreateTaskRequest` rather than `Contract` suffix (pre-existing pattern, not introduced by this changeset)
-- **Validators** — FluentValidation validators wired up via `AddFluentValidationAutoValidation`
-- **Settings** — `AppSettings` bound from `appsettings.json` (Timezone, ApiKeyCacheSlidingExpiration); uses `[Required]` data annotations for options validation (acceptable — this is .NET Options pattern, not controller input validation)
-- **Exception handling** — `ApiExceptionHandler` (`IExceptionHandler`), `NotFoundException`, `BusinessException`
+- **Collaborators** — `ITaskApiCollaborator` / `TaskApiCollaborator` (typed HttpClient); `TaskApiConstants` (Endpoints + Headers)
+- **Collaborators/Dto** — `TaskItemDto`, `CreateTaskRequestDto`, `UpdateTaskRequestDto`, `TaskItemStatusDto`, `TaskPriorityDto`
+- **Inputs** — `CreateTaskInput`, `UpdateTaskInput` (record types)
+- **Outputs** — `TaskItem`, `TaskItemStatus`, `TaskPriority`
+- **Mappers** — `TaskItemMappingExtensions` (Dto → Output, Input → Dto)
+- **Common** — `ITimeService` / `TimeService` (timezone-aware today calculation)
+- **Settings** — `McpSettings` (ApiBaseUrl, ApiKey, Timezone)
+- **Utilities** — `ApiCallHelper`, `MediaTypes`, `ValidationConstants`, `IOutputSerializer` / `JsonOutputSerializer`
 
-**Why:** Tracks what is actually present so future reviews don't flag missing layers as absent.
-**How to apply:** Use as baseline when reviewing new files — don't flag "layer doesn't exist" for layers listed above.
+**Why:** Tracks what is present so future reviews can evaluate all layers against full convention set.
+**How to apply:** Do not treat any layer as scaffolding-only. Review all layers against the full convention set documented in CLAUDE.md.

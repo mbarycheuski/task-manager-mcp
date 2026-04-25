@@ -72,14 +72,18 @@ if ($Down) {
     exit $LASTEXITCODE
 }
 
+$mcpToken = (Get-Content $envFile | Where-Object { $_ -match '^MCP_PROXY_AUTH_TOKEN=' }) -replace '^MCP_PROXY_AUTH_TOKEN=', ''
+$inspectorUrl = "http://localhost:6274?MCP_PROXY_AUTH_TOKEN=$mcpToken"
+
 Write-Host ""
-Write-Host "+----------------------+-------------+------------------------------------------+"
-Write-Host "| Container            | Type        | Link                                     |"
-Write-Host "+----------------------+-------------+------------------------------------------+"
-Write-Host "| task-manager-db      | Postgres    |                                          |"
-Write-Host "| task-manager-api     | .NET API    | http://localhost:8080/docs (Swagger UI)  |"
-Write-Host "| task-manager-mcp     | MCP Server  | http://localhost:5050/mcp                |"
-Write-Host "+----------------------+-------------+------------------------------------------+"
+Write-Host "+------------------------------+---------------+------------------------------------------+"
+Write-Host "| Container                    | Type          | Link                                     |"
+Write-Host "+------------------------------+---------------+------------------------------------------+"
+Write-Host "| task-manager-db              | Postgres      |                                          |"
+Write-Host "| task-manager-api             | .NET API      | http://localhost:8080/docs (Swagger UI)  |"
+Write-Host "| task-manager-mcp             | MCP Server    | http://localhost:5050                    |"
+Write-Host "| task-manager-mcp-inspector   | MCP Inspector | $inspectorUrl                            |"
+Write-Host "+------------------------------+---------------+------------------------------------------+"
 Write-Host ""
 
 if ($Build) {

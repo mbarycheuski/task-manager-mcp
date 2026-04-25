@@ -11,4 +11,7 @@ public class McpSettings
 
     [Required]
     public required string ApiKey { get; init; }
+
+    [Required]
+    public required string Timezone { get; init; }
 }
