@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using ModelContextProtocol;
 using ModelContextProtocol.Server;
-using TaskManager.Mcp.Common;
 using TaskManager.Mcp.Inputs;
 using TaskManager.Mcp.Services;
 using TaskManager.Mcp.Utilities;
@@ -10,7 +9,7 @@ using TaskItemOutput = TaskManager.Mcp.Outputs.TaskItem;
 namespace TaskManager.Mcp.Tools;
 
 [McpServerToolType]
-public class TaskTools(ITaskService taskService, ITimeService timeService)
+public class TaskTools(ITaskService taskService)
 {
     [McpServerTool(
         Name = "get_all_tasks",
@@ -19,7 +18,7 @@ public class TaskTools(ITaskService taskService, ITimeService timeService)
     )]
     [Description("Returns the complete list of tasks.")]
     public Task<IReadOnlyList<TaskItemOutput>> GetAllAsync(CancellationToken cancellationToken) =>
-        McpErrorHandler.ExecuteAsync(() => taskService.GetAllAsync(cancellationToken));
+        taskService.GetAllAsync(cancellationToken);
 
     [McpServerTool(
         Name = "get_task",
@@ -35,7 +34,7 @@ public class TaskTools(ITaskService taskService, ITimeService timeService)
         if (id == Guid.Empty)
             throw new McpProtocolException("Task ID cannot be empty.", McpErrorCode.InvalidParams);
 
-        return McpErrorHandler.ExecuteAsync(() => taskService.GetByIdAsync(id, cancellationToken));
+        return taskService.GetByIdAsync(id, cancellationToken);
     }
 
     [McpServerTool(
@@ -78,17 +77,9 @@ public class TaskTools(ITaskService taskService, ITimeService timeService)
                 McpErrorCode.InvalidParams
             );
 
-        if (dueDate.HasValue && dueDate < timeService.GetTodayInDefaultTimezone())
-            throw new McpProtocolException(
-                "Due date cannot be in the past.",
-                McpErrorCode.InvalidParams
-            );
-
         var input = new CreateTaskInput(title, notes, priority, dueDate);
 
-        return McpErrorHandler.ExecuteAsync(() =>
-            taskService.CreateAsync(input, cancellationToken)
-        );
+        return taskService.CreateAsync(input, cancellationToken);
     }
 
     [McpServerTool(
@@ -143,17 +134,9 @@ public class TaskTools(ITaskService taskService, ITimeService timeService)
                 McpErrorCode.InvalidParams
             );
 
-        if (dueDate.HasValue && dueDate < timeService.GetTodayInDefaultTimezone())
-            throw new McpProtocolException(
-                "Due date cannot be in the past.",
-                McpErrorCode.InvalidParams
-            );
-
         var input = new UpdateTaskInput(title, notes, priority, status, dueDate);
 
-        return McpErrorHandler.ExecuteAsync(() =>
-            taskService.UpdateAsync(id, input, cancellationToken)
-        );
+        return taskService.UpdateAsync(id, input, cancellationToken);
     }
 
     [McpServerTool(Name = "delete_task")]
@@ -166,6 +149,6 @@ public class TaskTools(ITaskService taskService, ITimeService timeService)
         if (id == Guid.Empty)
             throw new McpProtocolException("Task ID cannot be empty.", McpErrorCode.InvalidParams);
 
-        return McpErrorHandler.ExecuteAsync(() => taskService.DeleteAsync(id, cancellationToken));
+        return taskService.DeleteAsync(id, cancellationToken);
     }
 }

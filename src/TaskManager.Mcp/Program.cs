@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Options;
+using ModelContextProtocol.Protocol;
 using TaskManager.Mcp.Collaborators;
 using TaskManager.Mcp.Common;
+using TaskManager.Mcp.Exceptions;
 using TaskManager.Mcp.Resources;
 using TaskManager.Mcp.Services;
 using TaskManager.Mcp.Settings;
@@ -35,7 +37,27 @@ builder
     .Services.AddMcpServer()
     .WithHttpTransport(options => options.Stateless = true)
     .WithTools<TaskTools>()
-    .WithResources<TaskResources>();
+    .WithResources<TaskResources>()
+    .WithRequestFilters(requestFilters =>
+    {
+        requestFilters.AddCallToolFilter(next =>
+            async (context, cancellationToken) =>
+            {
+                try
+                {
+                    return await next(context, cancellationToken);
+                }
+                catch (AppException ex)
+                {
+                    return new CallToolResult
+                    {
+                        Content = [new TextContentBlock { Text = ex.Message }],
+                        IsError = true,
+                    };
+                }
+            }
+        );
+    });
 
 builder.Services.AddProblemDetails();
 

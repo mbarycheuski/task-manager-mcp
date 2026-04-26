@@ -50,6 +50,7 @@ Docker runs inside WSL. Use `run.ps1` from the repo root (requires a `.env` file
 - Tools, resources, and prompts handle only MCP concerns — no HTTP calls or business logic inside them
 - Services contain orchestration logic; no MCP types (`McpServer`, context objects) in services
 - Collaborators are typed `HttpClient` wrappers; `X-Api-Key` is set once as a default request header at DI registration — never per-call
+- Exception handling: throw `ValidationException` for input validation errors, `NotFoundException` for missing resources, `AppException` for API errors; an `AddCallToolFilter` registered in `Program.cs` catches these and converts to `McpProtocolException` with appropriate error codes; `ApiErrorHandler` wraps service calls and converts `HttpRequestException` to domain exceptions
 
 ## When Making Changes
 

@@ -2,7 +2,6 @@ using System.ComponentModel;
 using ModelContextProtocol;
 using ModelContextProtocol.Server;
 using TaskManager.Mcp.Services;
-using TaskManager.Mcp.Tools;
 using TaskManager.Mcp.Utilities;
 using TaskManager.Mcp.Utilities.Serializers;
 
@@ -15,9 +14,7 @@ public class TaskResources(ITaskService taskService, IOutputSerializer serialize
     [Description("All tasks.")]
     public async Task<string> GetAllTasksAsync(CancellationToken cancellationToken)
     {
-        var tasks = await McpErrorHandler.ExecuteAsync(() =>
-            taskService.GetAllAsync(cancellationToken)
-        );
+        var tasks = await taskService.GetAllAsync(cancellationToken);
 
         return serializer.Serialize(tasks);
     }
@@ -30,9 +27,7 @@ public class TaskResources(ITaskService taskService, IOutputSerializer serialize
     [Description("Tasks with status Completed.")]
     public async Task<string> GetCompletedTasksAsync(CancellationToken cancellationToken)
     {
-        var tasks = await McpErrorHandler.ExecuteAsync(() =>
-            taskService.GetCompletedAsync(cancellationToken)
-        );
+        var tasks = await taskService.GetCompletedAsync(cancellationToken);
 
         return serializer.Serialize(tasks);
     }
@@ -45,9 +40,7 @@ public class TaskResources(ITaskService taskService, IOutputSerializer serialize
     [Description("Tasks with status InProgress.")]
     public async Task<string> GetInProgressTasksAsync(CancellationToken cancellationToken)
     {
-        var tasks = await McpErrorHandler.ExecuteAsync(() =>
-            taskService.GetInProgressAsync(cancellationToken)
-        );
+        var tasks = await taskService.GetInProgressAsync(cancellationToken);
 
         return serializer.Serialize(tasks);
     }
@@ -60,9 +53,7 @@ public class TaskResources(ITaskService taskService, IOutputSerializer serialize
     [Description("Tasks due today.")]
     public async Task<string> GetTodayTasksAsync(CancellationToken cancellationToken)
     {
-        var tasks = await McpErrorHandler.ExecuteAsync(() =>
-            taskService.GetTodayAsync(cancellationToken)
-        );
+        var tasks = await taskService.GetTodayAsync(cancellationToken);
 
         return serializer.Serialize(tasks);
     }
@@ -74,9 +65,7 @@ public class TaskResources(ITaskService taskService, IOutputSerializer serialize
         if (id == Guid.Empty)
             throw new McpProtocolException("Task ID cannot be empty.", McpErrorCode.InvalidParams);
 
-        var task = await McpErrorHandler.ExecuteAsync(() =>
-            taskService.GetByIdAsync(id, cancellationToken)
-        );
+        var task = await taskService.GetByIdAsync(id, cancellationToken);
 
         return serializer.Serialize(task);
     }
