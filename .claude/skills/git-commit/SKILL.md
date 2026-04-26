@@ -31,6 +31,7 @@ Write git commit messages following conventional commits style: capitalized impe
 - <Change 2>
 
 Co-Authored-By: <Model Name> <noreply@anthropic.com>
+```
 
 A blank line must separate the subject from the body, and the body from the trailer.
 
@@ -38,13 +39,14 @@ A blank line must separate the subject from the body, and the body from the trai
 
 Pick the type matching the **primary intent** of the change. If ambiguous, choose the type that reflects the goal, not the side effect.
 
-| Type       | When to use                           |
-|------------|---------------------------------------|
-| `feat`     | New user-facing feature               |
-| `fix`      | Bug fix                               |
-| `docs`     | Documentation-only changes            |
-| `refactor` | Restructuring without behavior change |
-| `test`     | Adding or modifying tests only        |
+| Type       | When to use                            |
+|------------|----------------------------------------|
+| `feat`     | New user-facing feature                |
+| `fix`      | Bug fix                                |
+| `docs`     | Documentation-only changes             |
+| `refactor` | Restructuring without behavior change  |
+| `test`     | Adding or modifying tests only         |
+| `chore`    | Maintenance tasks, build scripts, etc. |
 
 ## Scope
 
