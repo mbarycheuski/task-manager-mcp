@@ -5,7 +5,7 @@ namespace TaskManager.Mcp.Collaborators;
 public interface ITaskApiCollaborator
 {
     Task<IReadOnlyList<TaskItemDto>> GetAllAsync(
-        TaskItemStatusDto? status,
+        IReadOnlyList<TaskItemStatusDto>? statuses,
         DateOnly? dueDateFrom,
         DateOnly? dueDateTo,
         CancellationToken cancellationToken

@@ -8,7 +8,7 @@ public interface ITaskRepository
     Task<TaskItem?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
     Task<TaskItem?> GetByIdReadOnlyAsync(Guid id, CancellationToken cancellationToken);
     Task<IReadOnlyList<TaskItem>> GetAllAsync(
-        TaskItemStatus? status,
+        IReadOnlyList<TaskItemStatus>? statuses,
         TaskPriority? priority,
         DateOnly? dueDateFrom,
         DateOnly? dueDateTo,

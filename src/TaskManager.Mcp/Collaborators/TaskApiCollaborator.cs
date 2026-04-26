@@ -1,32 +1,32 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TaskManager.Mcp.Collaborators.Dto;
+using TaskManager.Mcp.Common;
 
 namespace TaskManager.Mcp.Collaborators;
 
 public class TaskApiCollaborator(HttpClient httpClient) : ITaskApiCollaborator
 {
-    private const string DateFormat = "yyyy-MM-dd";
-
     private static readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
         Converters = { new JsonStringEnumConverter() },
     };
 
     public async Task<IReadOnlyList<TaskItemDto>> GetAllAsync(
-        TaskItemStatusDto? status,
+        IReadOnlyList<TaskItemStatusDto>? statuses,
         DateOnly? dueDateFrom,
         DateOnly? dueDateTo,
         CancellationToken cancellationToken
     )
     {
-        var queryParts = new List<string>(3);
-        if (status.HasValue)
-            queryParts.Add($"status={status.Value}");
+        var queryParts = new List<string>();
+        if (statuses is not null)
+            foreach (var s in statuses)
+                queryParts.Add($"statuses={s}");
         if (dueDateFrom.HasValue)
-            queryParts.Add($"dueDateFrom={dueDateFrom.Value.ToString(DateFormat)}");
+            queryParts.Add($"dueDateFrom={dueDateFrom.Value.ToString(DateFormats.Default)}");
         if (dueDateTo.HasValue)
-            queryParts.Add($"dueDateTo={dueDateTo.Value.ToString(DateFormat)}");
+            queryParts.Add($"dueDateTo={dueDateTo.Value.ToString(DateFormats.Default)}");
 
         var endpoint =
             queryParts.Count > 0

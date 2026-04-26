@@ -82,6 +82,16 @@ public static class TaskItemMappingExtensions
             ),
         };
 
+    public static IReadOnlyList<TaskItemStatusDto>? ToDto(
+        this IReadOnlyList<TaskItemStatusOutput>? statuses
+    )
+    {
+        if (statuses is null || statuses.Count == 0)
+            return null;
+
+        return [.. statuses.Select(s => s.ToDto())];
+    }
+
     private static TaskItemStatusOutput ToOutput(this TaskItemStatusDto status) =>
         status switch
         {

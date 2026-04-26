@@ -14,7 +14,7 @@ public class TaskResources(ITaskService taskService, IOutputSerializer serialize
     [Description("All tasks.")]
     public async Task<string> GetAllTasksAsync(CancellationToken cancellationToken)
     {
-        var tasks = await taskService.GetAllAsync(cancellationToken);
+        var tasks = await taskService.GetAllAsync(null, null, null, cancellationToken);
 
         return serializer.Serialize(tasks);
     }
@@ -41,6 +41,19 @@ public class TaskResources(ITaskService taskService, IOutputSerializer serialize
     public async Task<string> GetInProgressTasksAsync(CancellationToken cancellationToken)
     {
         var tasks = await taskService.GetInProgressAsync(cancellationToken);
+
+        return serializer.Serialize(tasks);
+    }
+
+    [McpServerResource(
+        UriTemplate = "tasks://open",
+        Name = "open-tasks",
+        MimeType = MediaTypes.Json
+    )]
+    [Description("Tasks that are not yet completed (status None or InProgress).")]
+    public async Task<string> GetOpenTasksAsync(CancellationToken cancellationToken)
+    {
+        var tasks = await taskService.GetOpenAsync(cancellationToken);
 
         return serializer.Serialize(tasks);
     }

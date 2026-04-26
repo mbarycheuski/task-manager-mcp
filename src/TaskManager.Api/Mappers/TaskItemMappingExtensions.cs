@@ -102,6 +102,16 @@ public static class TaskItemMappingExtensions
         };
     }
 
+    public static IReadOnlyList<TaskItemStatusDomain>? ToDomain(
+        this IReadOnlyList<TaskItemStatus>? statuses
+    )
+    {
+        if (statuses is null || statuses.Count == 0)
+            return null;
+
+        return [.. statuses.Select(s => s.ToDomain())];
+    }
+
     public static TaskPriorityDomain? ToDomain(this TaskPriority? priority)
     {
         if (priority is null)

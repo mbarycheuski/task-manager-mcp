@@ -24,7 +24,7 @@ public class TaskRepository(TaskDbContext taskDbContext) : ITaskRepository
     }
 
     public async Task<IReadOnlyList<TaskItem>> GetAllAsync(
-        TaskItemStatus? status,
+        IReadOnlyList<TaskItemStatus>? statuses,
         TaskPriority? priority,
         DateOnly? dueDateFrom,
         DateOnly? dueDateTo,
@@ -33,9 +33,9 @@ public class TaskRepository(TaskDbContext taskDbContext) : ITaskRepository
     {
         var query = taskDbContext.Tasks.AsNoTracking().AsQueryable();
 
-        if (status.HasValue)
+        if (statuses?.Count > 0)
         {
-            query = query.Where(t => t.Status == status.Value);
+            query = query.Where(t => statuses.Contains(t.Status));
         }
 
         if (priority.HasValue)

@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using ModelContextProtocol;
 using ModelContextProtocol.Server;
+using TaskManager.Mcp.Common;
 using TaskManager.Mcp.Inputs;
 using TaskManager.Mcp.Services;
 using TaskManager.Mcp.Utilities;
@@ -16,9 +17,39 @@ public class TaskTools(ITaskService taskService)
         UseStructuredContent = true,
         OutputSchemaType = typeof(TaskItemOutput[])
     )]
-    [Description("Returns the complete list of tasks.")]
-    public Task<IReadOnlyList<TaskItemOutput>> GetAllAsync(CancellationToken cancellationToken) =>
-        taskService.GetAllAsync(cancellationToken);
+    [Description(
+        "Returns tasks, optionally filtered by one or more statuses and/or due-date range. All filters are optional; omit them to return every task."
+    )]
+    public Task<IReadOnlyList<TaskItemOutput>> GetAllAsync(
+        [Description(
+            "Filter by one or more statuses: None, InProgress, Completed (optional). Multiple values match any of the given statuses."
+        )]
+            IReadOnlyList<Outputs.TaskItemStatus>? statuses,
+        [Description(
+            $"Filter to tasks with due date on or after this date, in {DateFormats.Default} format (optional, inclusive)"
+        )]
+            DateOnly? dueDateFrom,
+        [Description(
+            $"Filter to tasks with due date on or before this date, in {DateFormats.Default} format (optional, inclusive). To match a single date, set dueDateFrom and dueDateTo to the same value."
+        )]
+            DateOnly? dueDateTo,
+        CancellationToken cancellationToken
+    )
+    {
+        if (statuses is not null && statuses.Any(s => !Enum.IsDefined(s)))
+            throw new McpProtocolException(
+                "One or more status values are invalid.",
+                McpErrorCode.InvalidParams
+            );
+
+        if (dueDateFrom.HasValue && dueDateTo.HasValue && dueDateFrom.Value > dueDateTo.Value)
+            throw new McpProtocolException(
+                "dueDateFrom cannot be later than dueDateTo.",
+                McpErrorCode.InvalidParams
+            );
+
+        return taskService.GetAllAsync(statuses, dueDateFrom, dueDateTo, cancellationToken);
+    }
 
     [McpServerTool(
         Name = "get_task",
@@ -48,7 +79,9 @@ public class TaskTools(ITaskService taskService)
         [Description("Task notes (optional)")] string? notes,
         [Description("Task priority: Low, Medium, High, or Critical (optional)")]
             Outputs.TaskPriority? priority,
-        [Description("Due date in yyyy-MM-dd format (optional, must be today or later)")]
+        [Description(
+            $"Due date in {DateFormats.Default} format (optional, must be today or later)"
+        )]
             DateOnly? dueDate,
         CancellationToken cancellationToken
     )
@@ -96,7 +129,9 @@ public class TaskTools(ITaskService taskService)
             Outputs.TaskPriority? priority,
         [Description("Updated status: None, InProgress, or Completed (required)")]
             Outputs.TaskItemStatus status,
-        [Description("Updated due date in yyyy-MM-dd format (optional, must be today or later)")]
+        [Description(
+            $"Updated due date in {DateFormats.Default} format (optional, must be today or later)"
+        )]
             DateOnly? dueDate,
         CancellationToken cancellationToken
     )

@@ -6,16 +6,32 @@ using TaskManager.Mcp.Inputs;
 using TaskManager.Mcp.Mappers;
 using TaskManager.Mcp.Utilities;
 using TaskItemOutput = TaskManager.Mcp.Outputs.TaskItem;
+using TaskItemStatusOutput = TaskManager.Mcp.Outputs.TaskItemStatus;
 
 namespace TaskManager.Mcp.Services;
 
 public class TaskService(ITaskApiCollaborator collaborator, ITimeService timeService) : ITaskService
 {
-    public Task<IReadOnlyList<TaskItemOutput>> GetAllAsync(CancellationToken cancellationToken)
+    public Task<IReadOnlyList<TaskItemOutput>> GetAllAsync(
+        IReadOnlyList<TaskItemStatusOutput>? statuses,
+        DateOnly? dueDateFrom,
+        DateOnly? dueDateTo,
+        CancellationToken cancellationToken
+    )
     {
+        if (dueDateFrom.HasValue && dueDateTo.HasValue && dueDateFrom.Value > dueDateTo.Value)
+        {
+            throw new ValidationException("Due date range start cannot be later than its end.");
+        }
+
         return ApiErrorHandler.ExecuteAsync<IReadOnlyList<TaskItemOutput>>(async () =>
         {
-            var dtos = await collaborator.GetAllAsync(null, null, null, cancellationToken);
+            var dtos = await collaborator.GetAllAsync(
+                statuses.ToDto(),
+                dueDateFrom,
+                dueDateTo,
+                cancellationToken
+            );
 
             return [.. dtos.Select(dto => dto.ToOutput())];
         });
@@ -28,7 +44,7 @@ public class TaskService(ITaskApiCollaborator collaborator, ITimeService timeSer
         return ApiErrorHandler.ExecuteAsync<IReadOnlyList<TaskItemOutput>>(async () =>
         {
             var dtos = await collaborator.GetAllAsync(
-                TaskItemStatusDto.Completed,
+                [TaskItemStatusDto.Completed],
                 null,
                 null,
                 cancellationToken
@@ -45,7 +61,22 @@ public class TaskService(ITaskApiCollaborator collaborator, ITimeService timeSer
         return ApiErrorHandler.ExecuteAsync<IReadOnlyList<TaskItemOutput>>(async () =>
         {
             var dtos = await collaborator.GetAllAsync(
-                TaskItemStatusDto.InProgress,
+                [TaskItemStatusDto.InProgress],
+                null,
+                null,
+                cancellationToken
+            );
+
+            return [.. dtos.Select(dto => dto.ToOutput())];
+        });
+    }
+
+    public Task<IReadOnlyList<TaskItemOutput>> GetOpenAsync(CancellationToken cancellationToken)
+    {
+        return ApiErrorHandler.ExecuteAsync<IReadOnlyList<TaskItemOutput>>(async () =>
+        {
+            var dtos = await collaborator.GetAllAsync(
+                [TaskItemStatusDto.None, TaskItemStatusDto.InProgress],
                 null,
                 null,
                 cancellationToken

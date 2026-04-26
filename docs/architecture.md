@@ -127,7 +127,7 @@ All endpoints require a valid API key in the `X-Api-Key` header via a custom ASP
 | PUT    | /api/tasks/{id} | Update a task            |
 | DELETE | /api/tasks/{id} | Delete a task            |
 
-Query filter parameters for `GET /api/tasks`: `status`, `priority`, `dueDateFrom`, `dueDateTo` (all optional).
+Query filter parameters for `GET /api/tasks`: `statuses` (multi-value list, optional), `priority`, `dueDateFrom`, `dueDateTo` (all optional).
 
 ---
 
@@ -162,9 +162,9 @@ Tool / Resource returns Output    — MCP client receives Output types
 
 ### Tools
 
-| Tool            | Description                          | API Call               | Status       |
-|-----------------|--------------------------------------|------------------------|--------------|
-| `get_all_tasks` | List all tasks                       | GET /api/tasks         | ✅ Implemented |
+| Tool            | Description                                                                      | API Call               | Status       |
+|-----------------|----------------------------------------------------------------------------------|------------------------|--------------|
+| `get_all_tasks` | List tasks; optional filters: `statuses` (list), `dueDateFrom`, `dueDateTo` (inclusive) | GET /api/tasks         | ✅ Implemented |
 | `get_task`      | Get a single task by ID              | GET /api/tasks/{id}    | ✅ Implemented |
 | `add_task`      | Create a new task                    | POST /api/tasks        | ✅ Implemented |
 | `update_task`   | Update an existing task              | PUT /api/tasks/{id}    | ✅ Implemented |
@@ -175,16 +175,18 @@ Tool / Resource returns Output    — MCP client receives Output types
 | URI                   | API Call                                                        | Status         |
 |-----------------------|-----------------------------------------------------------------|----------------|
 | `tasks://all`         | GET /api/tasks                                                  | ✅ Implemented |
-| `tasks://completed`   | GET /api/tasks?status=Completed                                 | ✅ Implemented |
-| `tasks://in-progress` | GET /api/tasks?status=InProgress                                | ✅ Implemented |
+| `tasks://completed`   | GET /api/tasks?statuses=Completed                               | ✅ Implemented |
+| `tasks://in-progress` | GET /api/tasks?statuses=InProgress                              | ✅ Implemented |
+| `tasks://open`        | GET /api/tasks?statuses=None&statuses=InProgress                | ✅ Implemented |
 | `tasks://today`       | GET /api/tasks?dueDateFrom={today}&dueDateTo={today}            | ✅ Implemented |
 
 ### Prompts
 
-| Prompt             | Description                                               |
-|--------------------|-----------------------------------------------------------|
-| `daily-plan`       | Top 3 highest-priority tasks due today                    |
-| `prioritize-tasks` | Reviews open tasks and suggests a prioritized order       |
+| Prompt             | Description                                               | Status             |
+|--------------------|-----------------------------------------------------------|----------------|
+| `daily-plan`       | Top 3 highest-priority tasks due today                    | ✅ Implemented |
+| `prioritize-tasks` | Reviews open tasks and suggests a prioritized order       | ✅ Implemented |
+
 
 ### Configuration
 

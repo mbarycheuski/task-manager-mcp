@@ -66,7 +66,7 @@ A single-user task management system consisting of two components, both C# .NET 
 
 ### Query filters (`GET /api/tasks`)
 
-- `status`, `priority` — must be valid enum values if provided
+- `statuses` (list), `priority` — must be valid enum values if provided
 - `dueDateFrom` ≤ `dueDateTo` when both are supplied
 - Invalid filter values return `400 BusinessException`
 

@@ -32,6 +32,7 @@ Do not rely on assumptions about conventions — read the relevant sections befo
 
 Render as Markdown:
 
+```markdown
 ## Code Review Report
 
 ### Summary
@@ -48,10 +49,11 @@ Render as Markdown:
 
 ### Verdict
 [APPROVED | APPROVED WITH MINOR NOTES | CHANGES REQUIRED] — [one sentence]
+```
 
 ## Severity Definitions
 
-- **Critical** — violates core architectural rules (wrong layer dependency, missing tests for public methods, security issue)
+- **Critical** — violates core architectural rules (wrong layer dependency, security issue)
 - **Major** — violates an explicit coding standard (wrong type usage, missing validation, incorrect pattern)
 - **Minor** — style or naming issue that doesn't affect correctness but deviates from conventions
 

@@ -9,7 +9,10 @@
       "Bash(dotnet *)",
       "Bash(docker compose *)",
       "mcp__task-manager__get_all_tasks",
-      "mcp__task-manager__add_task"
+      "mcp__task-manager__get_task",
+      "mcp__task-manager__add_task",
+      "mcp__task-manager__update_task",
+      "mcp__task-manager__delete_task"
     ]
   },
   "enabledMcpjsonServers": [

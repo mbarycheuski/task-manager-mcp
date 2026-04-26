@@ -7,7 +7,7 @@ public class TaskQueryFiltersValidator : AbstractValidator<TaskQueryFilters>
 {
     public TaskQueryFiltersValidator()
     {
-        RuleFor(x => x.Status).IsInEnum().When(x => x.Status.HasValue);
+        RuleForEach(x => x.Statuses).IsInEnum().When(x => x.Statuses is not null);
         RuleFor(x => x.Priority).IsInEnum().When(x => x.Priority.HasValue);
         RuleFor(x => x.DueDateFrom)
             .LessThanOrEqualTo(x => x.DueDateTo!.Value)

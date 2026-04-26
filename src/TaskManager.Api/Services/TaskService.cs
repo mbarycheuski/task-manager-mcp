@@ -16,7 +16,7 @@ public class TaskService(ITaskRepository repository, TimeProvider timeProvider) 
         ArgumentNullException.ThrowIfNull(taskQueryFilters);
 
         var tasks = await repository.GetAllAsync(
-            taskQueryFilters.Status.ToDomain(),
+            taskQueryFilters.Statuses.ToDomain(),
             taskQueryFilters.Priority.ToDomain(),
             taskQueryFilters.DueDateFrom,
             taskQueryFilters.DueDateTo,
