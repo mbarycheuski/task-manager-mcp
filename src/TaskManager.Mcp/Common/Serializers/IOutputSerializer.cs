@@ -1,4 +1,4 @@
-namespace TaskManager.Mcp.Utilities.Serializers;
+namespace TaskManager.Mcp.Common.Serializers;
 
 public interface IOutputSerializer
 {

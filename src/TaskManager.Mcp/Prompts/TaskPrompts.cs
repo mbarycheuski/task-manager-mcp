@@ -2,6 +2,7 @@ using System.ComponentModel;
 using Microsoft.Extensions.AI;
 using ModelContextProtocol.Server;
 using TaskManager.Mcp.Common;
+using TaskManager.Mcp.Common.Services;
 using TaskManager.Mcp.Services;
 
 namespace TaskManager.Mcp.Prompts;

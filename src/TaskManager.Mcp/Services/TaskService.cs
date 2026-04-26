@@ -1,10 +1,10 @@
 using TaskManager.Mcp.Collaborators;
 using TaskManager.Mcp.Collaborators.Dto;
 using TaskManager.Mcp.Common;
+using TaskManager.Mcp.Common.Services;
 using TaskManager.Mcp.Exceptions;
 using TaskManager.Mcp.Inputs;
 using TaskManager.Mcp.Mappers;
-using TaskManager.Mcp.Utilities;
 using TaskItemOutput = TaskManager.Mcp.Outputs.TaskItem;
 using TaskItemStatusOutput = TaskManager.Mcp.Outputs.TaskItemStatus;
 

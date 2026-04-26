@@ -1,7 +1,7 @@
 using System.Net;
 using TaskManager.Mcp.Exceptions;
 
-namespace TaskManager.Mcp.Utilities;
+namespace TaskManager.Mcp.Common;
 
 internal static class ApiErrorHandler
 {

@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Options;
 using TaskManager.Mcp.Settings;
 
-namespace TaskManager.Mcp.Common;
+namespace TaskManager.Mcp.Common.Services;
 
 public class TimeService(TimeProvider timeProvider, IOptions<McpSettings> mcpSettings)
     : ITimeService

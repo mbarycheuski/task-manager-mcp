@@ -4,7 +4,6 @@ using ModelContextProtocol.Server;
 using TaskManager.Mcp.Common;
 using TaskManager.Mcp.Inputs;
 using TaskManager.Mcp.Services;
-using TaskManager.Mcp.Utilities;
 using TaskItemOutput = TaskManager.Mcp.Outputs.TaskItem;
 
 namespace TaskManager.Mcp.Tools;

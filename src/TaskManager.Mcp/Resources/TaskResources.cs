@@ -1,9 +1,9 @@
 using System.ComponentModel;
 using ModelContextProtocol;
 using ModelContextProtocol.Server;
+using TaskManager.Mcp.Common;
+using TaskManager.Mcp.Common.Serializers;
 using TaskManager.Mcp.Services;
-using TaskManager.Mcp.Utilities;
-using TaskManager.Mcp.Utilities.Serializers;
 
 namespace TaskManager.Mcp.Resources;
 

@@ -1,4 +1,4 @@
-namespace TaskManager.Mcp.Utilities;
+namespace TaskManager.Mcp.Common;
 
 internal static class MediaTypes
 {

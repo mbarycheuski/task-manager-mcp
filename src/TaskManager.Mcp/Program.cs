@@ -2,6 +2,8 @@ using Microsoft.Extensions.Options;
 using ModelContextProtocol.Protocol;
 using TaskManager.Mcp.Collaborators;
 using TaskManager.Mcp.Common;
+using TaskManager.Mcp.Common.Serializers;
+using TaskManager.Mcp.Common.Services;
 using TaskManager.Mcp.Exceptions;
 using TaskManager.Mcp.Prompts;
 using TaskManager.Mcp.Providers;
@@ -9,7 +11,6 @@ using TaskManager.Mcp.Resources;
 using TaskManager.Mcp.Services;
 using TaskManager.Mcp.Settings;
 using TaskManager.Mcp.Tools;
-using TaskManager.Mcp.Utilities.Serializers;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace TaskManager.Mcp.Utilities.Serializers;
+namespace TaskManager.Mcp.Common.Serializers;
 
 public class JsonOutputSerializer : IOutputSerializer
 {
