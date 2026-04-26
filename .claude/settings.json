@@ -7,9 +7,14 @@
       "Bash(dotnet new *)",
       "Bash(dotnet package *)",
       "Bash(dotnet *)",
-      "Bash(docker compose *)"
+      "Bash(docker compose *)",
+      "mcp__task-manager__get_all_tasks",
+      "mcp__task-manager__add_task"
     ]
   },
+  "enabledMcpjsonServers": [
+    "task-manager"
+  ],
   "hooks": {
     "PreToolUse": [
       {
@@ -29,6 +34,13 @@
         "hooks": [
           {
             "type": "command",
+            "if": "Edit(*.cs)",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/csharpier-format.sh\"",
+            "statusMessage": "Formatting with CSharpier..."
+          },
+          {
+            "type": "command",
+            "if": "Write(*.cs)",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/csharpier-format.sh\"",
             "statusMessage": "Formatting with CSharpier..."
           }
