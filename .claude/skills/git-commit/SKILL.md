@@ -77,11 +77,13 @@ Use the human-friendly name of the model running the current session (e.g., `Cla
 ## Example
 
 ```
-feat(auth): Add password reset functionality
+feat(api): Add task priority filtering
 
-- Add forgot password form
-- Implement email verification flow
-- Add password reset endpoint
+- Add Priority field to TaskItem contract
+- Implement priority filter in TaskQueryFilters
+- Add database migration for priority column
+- Update TaskRepository to filter by priority
+- Add validation for priority enum values
 
 Co-Authored-By: Claude Opus 4.7 (https://github.com/claude)
 ```
