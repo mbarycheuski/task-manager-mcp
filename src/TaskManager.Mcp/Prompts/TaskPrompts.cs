@@ -15,9 +15,9 @@ public class TaskPrompts(IPromptService promptService, ITimeService timeService)
         "Builds a daily planning prompt for the top 3 highest-priority tasks due on the given date (defaults to today)."
     )]
     public async Task<ChatMessage> GetDailyPlanAsync(
-        CancellationToken cancellationToken,
         [Description($"The date to plan for in {DateFormats.Default} format. Defaults to today.")]
-            string? date = null
+            string? date = null,
+        CancellationToken cancellationToken = default
     )
     {
         var planDate = DateOnly.TryParseExact(date, DateFormats.Default, out var parsed)

@@ -10,7 +10,11 @@ public class CreateTaskRequestValidator : AbstractValidator<CreateTaskRequest>
     {
         ArgumentNullException.ThrowIfNull(timeService);
 
-        RuleFor(x => x.Title).NotEmpty().MaximumLength(255);
+        RuleFor(x => x.Title)
+            .NotEmpty()
+            .Must(title => !string.IsNullOrWhiteSpace(title))
+            .WithMessage("Title is required and cannot be empty")
+            .MaximumLength(255);
         RuleFor(x => x.Notes).MaximumLength(4000).When(x => x.Notes is not null);
         RuleFor(x => x.Priority).IsInEnum().When(x => x.Priority.HasValue);
         RuleFor(x => x.DueDate)

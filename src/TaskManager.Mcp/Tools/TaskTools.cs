@@ -1,7 +1,7 @@
 using System.ComponentModel;
-using ModelContextProtocol;
 using ModelContextProtocol.Server;
 using TaskManager.Mcp.Common;
+using TaskManager.Mcp.Exceptions;
 using TaskManager.Mcp.Inputs;
 using TaskManager.Mcp.Services;
 using TaskItemOutput = TaskManager.Mcp.Outputs.TaskItem;
@@ -23,29 +23,23 @@ public class TaskTools(ITaskService taskService)
         [Description(
             "Filter by one or more statuses: None, InProgress, Completed (optional). Multiple values match any of the given statuses."
         )]
-            IReadOnlyList<Outputs.TaskItemStatus>? statuses,
+            IReadOnlyList<Outputs.TaskItemStatus>? statuses = null,
         [Description(
             $"Filter to tasks with due date on or after this date, in {DateFormats.Default} format (optional, inclusive)"
         )]
-            DateOnly? dueDateFrom,
+            DateOnly? dueDateFrom = null,
         [Description(
             $"Filter to tasks with due date on or before this date, in {DateFormats.Default} format (optional, inclusive). To match a single date, set dueDateFrom and dueDateTo to the same value."
         )]
-            DateOnly? dueDateTo,
-        CancellationToken cancellationToken
+            DateOnly? dueDateTo = null,
+        CancellationToken cancellationToken = default
     )
     {
         if (statuses is not null && statuses.Any(s => !Enum.IsDefined(s)))
-            throw new McpProtocolException(
-                "One or more status values are invalid.",
-                McpErrorCode.InvalidParams
-            );
+            throw new ValidationException("One or more status values are invalid.");
 
         if (dueDateFrom.HasValue && dueDateTo.HasValue && dueDateFrom.Value > dueDateTo.Value)
-            throw new McpProtocolException(
-                "dueDateFrom cannot be later than dueDateTo.",
-                McpErrorCode.InvalidParams
-            );
+            throw new ValidationException("dueDateFrom cannot be later than dueDateTo.");
 
         return taskService.GetAllAsync(statuses, dueDateFrom, dueDateTo, cancellationToken);
     }
@@ -62,7 +56,7 @@ public class TaskTools(ITaskService taskService)
     )
     {
         if (id == Guid.Empty)
-            throw new McpProtocolException("Task ID cannot be empty.", McpErrorCode.InvalidParams);
+            throw new ValidationException("Task ID cannot be empty.");
 
         return taskService.GetByIdAsync(id, cancellationToken);
     }
@@ -75,39 +69,31 @@ public class TaskTools(ITaskService taskService)
     [Description("Create a new task.")]
     public Task<TaskItemOutput> AddTaskAsync(
         [Description("Task title (required)")] string title,
-        [Description("Task notes (optional)")] string? notes,
+        [Description("Task notes (optional)")] string? notes = null,
         [Description("Task priority: Low, Medium, High, or Critical (optional)")]
-            Outputs.TaskPriority? priority,
+            Outputs.TaskPriority? priority = null,
         [Description(
             $"Due date in {DateFormats.Default} format (optional, must be today or later)"
         )]
-            DateOnly? dueDate,
-        CancellationToken cancellationToken
+            DateOnly? dueDate = null,
+        CancellationToken cancellationToken = default
     )
     {
         if (string.IsNullOrWhiteSpace(title))
-            throw new McpProtocolException(
-                "Title is required and cannot be empty.",
-                McpErrorCode.InvalidParams
-            );
+            throw new ValidationException("Title is required and cannot be empty.");
 
         if (title.Length > ValidationConstants.MaxTitleLength)
-            throw new McpProtocolException(
-                $"Title cannot exceed {ValidationConstants.MaxTitleLength} characters.",
-                McpErrorCode.InvalidParams
+            throw new ValidationException(
+                $"Title cannot exceed {ValidationConstants.MaxTitleLength} characters."
             );
 
-        if (notes?.Length > ValidationConstants.MaxNotesLength)
-            throw new McpProtocolException(
-                $"Notes cannot exceed {ValidationConstants.MaxNotesLength} characters.",
-                McpErrorCode.InvalidParams
+        if (notes is not null && notes.Length > ValidationConstants.MaxNotesLength)
+            throw new ValidationException(
+                $"Notes cannot exceed {ValidationConstants.MaxNotesLength} characters."
             );
 
         if (priority.HasValue && !Enum.IsDefined(priority.Value))
-            throw new McpProtocolException(
-                "Priority is not a valid value.",
-                McpErrorCode.InvalidParams
-            );
+            throw new ValidationException("Priority is not a valid value.");
 
         var input = new CreateTaskInput(title, notes, priority, dueDate);
 
@@ -123,50 +109,39 @@ public class TaskTools(ITaskService taskService)
     public Task<TaskItemOutput> UpdateTaskAsync(
         [Description("The task ID (UUID)")] Guid id,
         [Description("Updated task title (required)")] string title,
-        [Description("Updated task notes (optional)")] string? notes,
-        [Description("Updated priority: Low, Medium, High, or Critical (optional)")]
-            Outputs.TaskPriority? priority,
         [Description("Updated status: None, InProgress, or Completed (required)")]
             Outputs.TaskItemStatus status,
+        [Description("Updated task notes (optional)")] string? notes = null,
+        [Description("Updated priority: Low, Medium, High, or Critical (optional)")]
+            Outputs.TaskPriority? priority = null,
         [Description(
             $"Updated due date in {DateFormats.Default} format (optional, must be today or later)"
         )]
-            DateOnly? dueDate,
-        CancellationToken cancellationToken
+            DateOnly? dueDate = null,
+        CancellationToken cancellationToken = default
     )
     {
         if (id == Guid.Empty)
-            throw new McpProtocolException("Task ID cannot be empty.", McpErrorCode.InvalidParams);
+            throw new ValidationException("Task ID cannot be empty.");
 
         if (string.IsNullOrWhiteSpace(title))
-            throw new McpProtocolException(
-                "Title is required and cannot be empty.",
-                McpErrorCode.InvalidParams
-            );
+            throw new ValidationException("Title is required and cannot be empty.");
 
         if (title.Length > ValidationConstants.MaxTitleLength)
-            throw new McpProtocolException(
-                $"Title cannot exceed {ValidationConstants.MaxTitleLength} characters.",
-                McpErrorCode.InvalidParams
+            throw new ValidationException(
+                $"Title cannot exceed {ValidationConstants.MaxTitleLength} characters."
             );
 
-        if (notes?.Length > ValidationConstants.MaxNotesLength)
-            throw new McpProtocolException(
-                $"Notes cannot exceed {ValidationConstants.MaxNotesLength} characters.",
-                McpErrorCode.InvalidParams
+        if (notes is not null && notes.Length > ValidationConstants.MaxNotesLength)
+            throw new ValidationException(
+                $"Notes cannot exceed {ValidationConstants.MaxNotesLength} characters."
             );
 
         if (priority.HasValue && !Enum.IsDefined(priority.Value))
-            throw new McpProtocolException(
-                "Priority is not a valid value.",
-                McpErrorCode.InvalidParams
-            );
+            throw new ValidationException("Priority is not a valid value.");
 
         if (!Enum.IsDefined(status))
-            throw new McpProtocolException(
-                "Status is not a valid value.",
-                McpErrorCode.InvalidParams
-            );
+            throw new ValidationException("Status is not a valid value.");
 
         var input = new UpdateTaskInput(title, notes, priority, status, dueDate);
 
@@ -181,7 +156,7 @@ public class TaskTools(ITaskService taskService)
     )
     {
         if (id == Guid.Empty)
-            throw new McpProtocolException("Task ID cannot be empty.", McpErrorCode.InvalidParams);
+            throw new ValidationException("Task ID cannot be empty.");
 
         return taskService.DeleteAsync(id, cancellationToken);
     }
