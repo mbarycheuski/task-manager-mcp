@@ -1,0 +1,9 @@
+{
+	"servers": {
+		"task-manager": {
+      		"type": "http",
+      		"url": "http://localhost:5050"
+		}
+	},
+	"inputs": []
+}
