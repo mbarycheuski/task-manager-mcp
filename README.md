@@ -40,13 +40,13 @@ cd task-manager-mcp
 
 ### 2. Configure Environment
 
-Copy the example environment file and configure your API key:
+Copy the example environment file and configure your secrets:
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-Edit `.env` and set the required secrets:
+Edit `.env` and set the required values:
 
 ```env
 API_KEY=<your-secret-api-key>              # Required — random high-entropy string
@@ -57,8 +57,6 @@ MCP_PROXY_AUTH_TOKEN=<your-mcp-token>      # Required — secures the MCP Inspec
 **Important**: Never commit `.env` to source control.
 
 ### 3. Start Services
-
-**Windows (PowerShell)**:
 
 ```powershell
 .\run.ps1              # Start services
@@ -76,12 +74,15 @@ Once containers are running:
 - **MCP Inspector**: See the URL displayed by `run.ps1` (includes auth token)
 - **Database**: PostgreSQL at `localhost:5432` (credentials from `.env`)
 
+## MCP Integration
 
-### MCP Integration
+### Claude Code
 
-A `.mcp.json` file is already included in the repository, so Claude Code connects to the MCP server automatically — no manual registration needed.
+A `.mcp.json` file is included in the repository, so Claude Code connects to the MCP server automatically — no manual registration needed.
 
-For other MCP clients, register the server in your client configuration:
+### Other MCP Clients
+
+Register the server in your client configuration:
 
 ```json
 {
@@ -94,7 +95,7 @@ For other MCP clients, register the server in your client configuration:
 }
 ```
 
-#### Available MCP Tools
+### Available Tools
 
 - `get_all_tasks` — List tasks with optional filters
 - `get_task` — Get a single task by ID
@@ -102,7 +103,7 @@ For other MCP clients, register the server in your client configuration:
 - `update_task` — Update an existing task
 - `delete_task` — Delete a task
 
-#### Available MCP Resources
+### Available Resources
 
 - `tasks://all` — All tasks
 - `tasks://open` — Tasks with status `None` or `InProgress`
@@ -110,16 +111,12 @@ For other MCP clients, register the server in your client configuration:
 - `tasks://completed` — Tasks with status `Completed`
 - `tasks://today` — Tasks due today
 
-#### Available MCP Prompts
+### Available Prompts
 
 - `daily-plan` — Suggests top 3 highest-priority tasks due on a given date; accepts an optional `date` argument (`yyyy-MM-dd`), defaults to today
 - `prioritize-tasks` — Analyzes open tasks and suggests a prioritized order
 
-### Example MCP Usage
-
-Ask Claude:
-
-> Run `/mcp__task-manager__daily-plan 2026-04-28` to get a suggested plan for `2026-04-28` top priority tasks.
+## Example Usage
 
 > "Create a task to review the Q2 budget, mark it as high priority, due next week."
 >
@@ -128,3 +125,7 @@ Ask Claude:
 > "Show me all in-progress tasks."
 >
 > Claude uses the `get_all_tasks` tool filtered by `InProgress` status.
+
+> "What should I work on today?"
+>
+> Claude uses the `daily-plan` prompt to suggest your top priority tasks for today.
