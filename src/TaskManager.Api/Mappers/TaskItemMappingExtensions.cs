@@ -84,24 +84,6 @@ public static class TaskItemMappingExtensions
             ),
         };
 
-    public static TaskItemStatusDomain? ToDomain(this TaskItemStatus? status)
-    {
-        if (status is null)
-            return null;
-
-        return status.Value switch
-        {
-            TaskItemStatus.None => TaskItemStatusDomain.None,
-            TaskItemStatus.InProgress => TaskItemStatusDomain.InProgress,
-            TaskItemStatus.Completed => TaskItemStatusDomain.Completed,
-            _ => throw new ArgumentOutOfRangeException(
-                nameof(status),
-                status,
-                $"Not supported {nameof(TaskItemStatus)} value."
-            ),
-        };
-    }
-
     public static IReadOnlyList<TaskItemStatusDomain>? ToDomain(
         this IReadOnlyList<TaskItemStatus>? statuses
     )

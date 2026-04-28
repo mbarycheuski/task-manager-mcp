@@ -1,10 +1,11 @@
 using System.ComponentModel;
 using ModelContextProtocol.Server;
 using TaskManager.Mcp.Common;
+using TaskManager.Mcp.Contracts;
+using TaskManager.Mcp.Contracts.Inputs;
 using TaskManager.Mcp.Exceptions;
-using TaskManager.Mcp.Inputs;
 using TaskManager.Mcp.Services;
-using TaskItemOutput = TaskManager.Mcp.Outputs.TaskItem;
+using TaskItemOutput = TaskManager.Mcp.Contracts.Outputs.TaskItem;
 
 namespace TaskManager.Mcp.Tools;
 
@@ -23,7 +24,7 @@ public class TaskTools(ITaskService taskService)
         [Description(
             "Filter by one or more statuses: None, InProgress, Completed (optional). Multiple values match any of the given statuses."
         )]
-            IReadOnlyList<Outputs.TaskItemStatus>? statuses = null,
+            IReadOnlyList<TaskItemStatus>? statuses = null,
         [Description(
             $"Filter to tasks with due date on or after this date, in {DateFormats.Default} format (optional, inclusive)"
         )]
@@ -71,7 +72,7 @@ public class TaskTools(ITaskService taskService)
         [Description("Task title (required)")] string title,
         [Description("Task notes (optional)")] string? notes = null,
         [Description("Task priority: Low, Medium, High, or Critical (optional)")]
-            Outputs.TaskPriority? priority = null,
+            TaskPriority? priority = null,
         [Description(
             $"Due date in {DateFormats.Default} format (optional, must be today or later)"
         )]
@@ -112,7 +113,7 @@ public class TaskTools(ITaskService taskService)
         [Description("Updated status: None, InProgress, or Completed (required)")] string status,
         [Description("Updated task notes (optional)")] string? notes = null,
         [Description("Updated priority: Low, Medium, High, or Critical (optional)")]
-            Outputs.TaskPriority? priority = null,
+            TaskPriority? priority = null,
         [Description(
             $"Updated due date in {DateFormats.Default} format (optional, must be today or later)"
         )]
@@ -141,11 +142,7 @@ public class TaskTools(ITaskService taskService)
 
         if (
             string.IsNullOrWhiteSpace(status)
-            || !Enum.TryParse<Outputs.TaskItemStatus>(
-                status,
-                ignoreCase: true,
-                out var parsedStatus
-            )
+            || !Enum.TryParse<TaskItemStatus>(status, ignoreCase: true, out var parsedStatus)
             || !Enum.IsDefined(parsedStatus)
         )
             throw new ValidationException("Status is not a valid value.");

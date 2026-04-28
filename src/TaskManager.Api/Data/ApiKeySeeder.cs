@@ -14,6 +14,7 @@ public class ApiKeySeeder(
 {
     private const string ApiKeyConfigKey = "API_KEY";
     private const string DefaultClientName = "mcp-server";
+    private const int SaltByteLength = 32;
 
     public async Task SeedAsync(CancellationToken cancellationToken = default)
     {
@@ -34,7 +35,7 @@ public class ApiKeySeeder(
             return;
         }
 
-        var saltBytes = RandomNumberGenerator.GetBytes(32);
+        var saltBytes = RandomNumberGenerator.GetBytes(SaltByteLength);
         var salt = Convert.ToBase64String(saltBytes);
         var keyHash = apiKeyHasher.HashKey(rawKey, salt);
 
@@ -50,6 +51,6 @@ public class ApiKeySeeder(
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        logger.LogInformation("Seeded default API key for client 'mcp-server'.");
+        logger.LogInformation($"Seeded default API key for client '{DefaultClientName}'.");
     }
 }

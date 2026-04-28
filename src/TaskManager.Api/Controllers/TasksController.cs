@@ -11,8 +11,8 @@ namespace TaskManager.Api.Controllers;
 [Produces("application/json")]
 public class TasksController(ITaskService taskService) : ControllerBase
 {
-    /// <summary>Returns all tasks, optionally filtered by status, priority, or due date range.</summary>
-    /// <param name="taskQueryFilters">Optional filters by status, priority, and due date range.</param>
+    /// <summary>Returns all tasks, optionally filtered by statuses, priority, or due date range.</summary>
+    /// <param name="taskQueryFilters">Optional filters by statuses, priority, and due date range.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     [HttpGet]
     [ProducesResponseType<IEnumerable<TaskItem>>(StatusCodes.Status200OK)]

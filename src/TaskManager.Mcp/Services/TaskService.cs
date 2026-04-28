@@ -2,11 +2,11 @@ using TaskManager.Mcp.Collaborators;
 using TaskManager.Mcp.Collaborators.Dto;
 using TaskManager.Mcp.Common;
 using TaskManager.Mcp.Common.Services;
+using TaskManager.Mcp.Contracts.Inputs;
 using TaskManager.Mcp.Exceptions;
-using TaskManager.Mcp.Inputs;
 using TaskManager.Mcp.Mappers;
-using TaskItemOutput = TaskManager.Mcp.Outputs.TaskItem;
-using TaskItemStatusOutput = TaskManager.Mcp.Outputs.TaskItemStatus;
+using TaskItemOutput = TaskManager.Mcp.Contracts.Outputs.TaskItem;
+using TaskItemStatusOutput = TaskManager.Mcp.Contracts.TaskItemStatus;
 
 namespace TaskManager.Mcp.Services;
 
@@ -121,7 +121,7 @@ public class TaskService(ITaskApiCollaborator collaborator, ITimeService timeSer
             throw new ValidationException("Due date cannot be in the past.");
         }
 
-        return ApiErrorHandler.ExecuteAsync<TaskItemOutput>(async () =>
+        return ApiErrorHandler.ExecuteAsync(async () =>
         {
             var dto = await collaborator.CreateAsync(input.ToDto(), cancellationToken);
 

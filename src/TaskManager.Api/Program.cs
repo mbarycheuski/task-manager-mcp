@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Text.Json.Serialization;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
@@ -18,9 +19,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder
     .Services.AddControllers()
     .AddJsonOptions(options =>
-        options.JsonSerializerOptions.Converters.Add(
-            new System.Text.Json.Serialization.JsonStringEnumConverter()
-        )
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter())
     );
 
 builder.Services.AddOpenApi();

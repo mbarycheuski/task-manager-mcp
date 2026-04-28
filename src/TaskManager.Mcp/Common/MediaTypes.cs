@@ -1,6 +1,6 @@
 namespace TaskManager.Mcp.Common;
 
-internal static class MediaTypes
+public static class MediaTypes
 {
-    internal const string Json = "application/json";
+    public const string Json = "application/json";
 }

@@ -11,7 +11,7 @@ As of the exception-middleware changeset (2026-04-26), both projects are substan
 **TaskManager.Mcp** — fully implemented:
 - **Tools** — `TaskTools` (get_all_tasks, get_task, add_task, update_task, delete_task)
 - **Resources** — `TaskResources` (tasks://all, tasks://completed, tasks://in-progress, tasks://today, tasks://{id})
-- **Services** — `ITaskService` / `TaskService`; `ApiErrorHandler` (internal static helper, lives in `Services/`)
+- **Services** — `ITaskService` / `TaskService`; `ApiErrorHandler` (static helper, lives in `Services/`)
 - **Collaborators** — `ITaskApiCollaborator` / `TaskApiCollaborator` (typed HttpClient); `TaskApiConstants` (Endpoints + Headers)
 - **Collaborators/Dto** — `TaskItemDto`, `CreateTaskRequestDto`, `UpdateTaskRequestDto`, `TaskItemStatusDto`, `TaskPriorityDto`
 - **Inputs** — `CreateTaskInput`, `UpdateTaskInput` (record types)

@@ -1,7 +1,7 @@
 namespace TaskManager.Mcp.Prompts;
 
-internal static class PromptResources
+public static class PromptResources
 {
-    internal const string DailyPlan = "DailyPlan.md";
-    internal const string PrioritizeTasks = "PrioritizeTasks.md";
+    public const string DailyPlan = "DailyPlan.md";
+    public const string PrioritizeTasks = "PrioritizeTasks.md";
 }

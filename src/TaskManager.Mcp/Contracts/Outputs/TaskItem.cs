@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace TaskManager.Mcp.Outputs;
+namespace TaskManager.Mcp.Contracts.Outputs;
 
 public record TaskItem(
     Guid Id,

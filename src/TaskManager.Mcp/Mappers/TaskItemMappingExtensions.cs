@@ -1,8 +1,8 @@
 using TaskManager.Mcp.Collaborators.Dto;
-using TaskManager.Mcp.Inputs;
-using TaskItemOutput = TaskManager.Mcp.Outputs.TaskItem;
-using TaskItemStatusOutput = TaskManager.Mcp.Outputs.TaskItemStatus;
-using TaskPriorityOutput = TaskManager.Mcp.Outputs.TaskPriority;
+using TaskManager.Mcp.Contracts.Inputs;
+using TaskItemOutput = TaskManager.Mcp.Contracts.Outputs.TaskItem;
+using TaskItemStatusOutput = TaskManager.Mcp.Contracts.TaskItemStatus;
+using TaskPriorityOutput = TaskManager.Mcp.Contracts.TaskPriority;
 
 namespace TaskManager.Mcp.Mappers;
 

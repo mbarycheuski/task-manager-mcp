@@ -30,13 +30,13 @@
     /Collaborators             — typed HttpClient wrappers; call TaskManager.Api
     /Collaborators/Dto         — DTOs mirroring API JSON response shapes
     /Common                    — shared utilities and services
-    /Common/Converters         — JSON converters (e.g., DateOnly serialization)
     /Common/Serializers        — MCP output serialization (IOutputSerializer implementations)
     /Common/Services           — utilities (TimeProvider interface)
     /Exceptions                — ValidationException, NotFoundException, AppException
-    /Inputs                    — input parameter types for tools/resources
+    /Contracts                 — shared enums (TaskItemStatus, TaskPriority), Inputs and Outputs
+    /Contracts/Inputs          — input parameter types for tools/resources
+    /Contracts/Outputs         — output types returned to MCP clients
     /Mappers                   — type mapping extensions (Dto → Output)
-    /Outputs                   — output types returned to MCP clients
     /Prompts                   — [McpServerPromptType] / [McpServerPrompt] attributes
     /Prompts/Content           — prompt template files (markdown)
     /Providers                 — prompt providers (load prompts from embedded resources)
@@ -170,9 +170,10 @@ Tool / Resource / Prompt returns Output    — MCP client receives Output types
 
 ### Types and Flow
 
-- **Inputs** (`/Inputs/CreateTaskInput`, etc.) — parameter types for tool methods; bound from MCP request attributes
+- **Contracts** (`/Contracts/`) — shared enums (`TaskItemStatus`, `TaskPriority`) used by both Inputs and Outputs
+- **Inputs** (`/Contracts/Inputs/CreateTaskInput`, etc.) — parameter types for tool methods; bound from MCP request attributes
+- **Outputs** (`/Contracts/Outputs/TaskItem`, etc.) — types returned to MCP clients; structured content + schema
 - **Dto** (`/Collaborators/Dto/`) — JSON shapes matching API responses; mapped from HTTP responses
-- **Outputs** (`/Outputs/TaskItem`, etc.) — types returned to MCP clients; structured content + schema
 - **Mappers** (`/Mappers/TaskItemMappingExtensions`) — convert Dto → Output; called by Service layer before returning to tools/resources
 
 ### Tools
@@ -228,7 +229,7 @@ Tool / Resource / Prompt returns Output    — MCP client receives Output types
 
 ## Docker Setup
 
-All services run inside Docker containers orchestrated by Docker Compose. No local .NET, Python, or PostgreSQL installation is required.
+All services run inside Docker containers orchestrated by Docker Compose. No local .NET, or PostgreSQL installation is required.
 
 - Secrets (API key, DB credentials) are provided via a `.env` file — never committed to source control.
 - EF Core migrations run automatically on API container start.

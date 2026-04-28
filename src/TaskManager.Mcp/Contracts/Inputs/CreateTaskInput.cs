@@ -1,6 +1,4 @@
-using TaskManager.Mcp.Outputs;
-
-namespace TaskManager.Mcp.Inputs;
+namespace TaskManager.Mcp.Contracts.Inputs;
 
 public record CreateTaskInput(
     string Title,

@@ -3,9 +3,9 @@ using TaskManager.Mcp.Exceptions;
 
 namespace TaskManager.Mcp.Common;
 
-internal static class ApiErrorHandler
+public static class ApiErrorHandler
 {
-    internal static async Task<T> ExecuteAsync<T>(Func<Task<T>> func)
+    public static async Task<T> ExecuteAsync<T>(Func<Task<T>> func)
     {
         ArgumentNullException.ThrowIfNull(func);
 
@@ -19,7 +19,7 @@ internal static class ApiErrorHandler
         }
     }
 
-    internal static async Task ExecuteAsync(Func<Task> func)
+    public static async Task ExecuteAsync(Func<Task> func)
     {
         ArgumentNullException.ThrowIfNull(func);
 

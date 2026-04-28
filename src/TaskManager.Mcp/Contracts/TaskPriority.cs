@@ -1,4 +1,4 @@
-namespace TaskManager.Mcp.Outputs;
+namespace TaskManager.Mcp.Contracts;
 
 public enum TaskPriority
 {
