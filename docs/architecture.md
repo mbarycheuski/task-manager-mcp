@@ -5,41 +5,45 @@
 ```
 /docs                        — project documentation
 /src
-  TaskManager.slnx           — solution file (both projects)
-  /TaskManager.Api           — C# .NET 10 CRUD API
-    /Auth                    — API key authentication handler, hasher, cache service
-    /Common                  — shared services (TimeService)
-    /Contracts               — request/response contract records
-    /Contracts/Enums         — enums used in contracts
-    /Controllers             — API controllers
-    /Data                    — DbContext, migrations, seeders, EF configurations
-    /Data/Configurations     — EF Core entity configurations
-    /Data/Migrations         — EF Core migrations
-    /Data/Models             — EF Core entity models
-    /Data/Models/Enums       — enums used by entity models
-    /Exceptions              — NotFoundException, BusinessException
-    /Exceptions/Handlers     — global IExceptionHandler implementations
-    /Mappers                 — entity ↔ contract mapping extensions
-    /OpenApi                 — Swagger/OpenAPI customizations
-    /Repositories            — repository interfaces and implementations
-    /Services                — business logic layer
-    /Settings                — strongly-typed configuration classes
-    /Validators              — FluentValidation validators
+  TaskManager.slnx             — solution file (both projects)
+  /TaskManager.Api             — C# .NET 10 CRUD API
+    /Auth                      — API key authentication: handler, hasher, cache service
+    /Common                    — utilities (TimeProvider interface)
+    /Contracts                 — request/response contract records
+    /Contracts/Enums           — enums used in contracts (API layer)
+    /Controllers               — HTTP controllers; handle validation via FluentValidation
+    /Data                      — EF Core DbContext, migrations, seeders, configurations
+    /Data/Configurations       — EF Core entity configurations
+    /Data/Migrations           — EF Core schema migrations
+    /Data/Models               — EF Core entity models
+    /Data/Models/Enums         — enums used by entity models (data layer)
+    /Exceptions                — NotFoundException, BusinessException
+    /Exceptions/Handlers       — global IExceptionHandler implementations
+    /Mappers                   — entity ↔ contract mapping extensions
+    /OpenApi                   — Swagger/OpenAPI customizations
+    /Repositories              — repository interfaces and implementations (data access layer)
+    /Services                  — business logic layer
+    /Settings                  — strongly-typed configuration (appsettings.json)
+    /Validators                — FluentValidation input validators
     Dockerfile
-  /TaskManager.Mcp           — C# .NET 10 MCP server (ModelContextProtocol.AspNetCore)
-    /Collaborators           — typed HttpClient wrappers for TaskManager.Api
-    /Collaborators/Dto       — DTOs mirroring API JSON response shapes
-    /Common                  — shared services (ITimeService)
-    /Inputs                  — input parameter types for tools/resources
-    /Mappers                 — type mapping extensions (Dto → Output, etc.)
-    /Outputs                 — output types returned to MCP clients
-    /Prompts                 — [McpServerPromptType] / [McpServerPrompt]
-    /Resources               — [McpServerResourceType] / [McpServerResource]
-    /Services                — orchestration layer (no MCP or HTTP concerns)
-    /Settings                — strongly-typed configuration (API base URL, API key)
-    /Tools                   — [McpServerToolType] / [McpServerTool]
-    /Utilities               — helper utilities (serializers, constants, validators)
-    /Utilities/Serializers   — JSON and custom serialization logic
+  /TaskManager.Mcp             — C# .NET 10 MCP server (ModelContextProtocol.AspNetCore)
+    /Collaborators             — typed HttpClient wrappers; call TaskManager.Api
+    /Collaborators/Dto         — DTOs mirroring API JSON response shapes
+    /Common                    — shared utilities and services
+    /Common/Converters         — JSON converters (e.g., DateOnly serialization)
+    /Common/Serializers        — MCP output serialization (IOutputSerializer implementations)
+    /Common/Services           — utilities (TimeProvider interface)
+    /Exceptions                — ValidationException, NotFoundException, AppException
+    /Inputs                    — input parameter types for tools/resources
+    /Mappers                   — type mapping extensions (Dto → Output)
+    /Outputs                   — output types returned to MCP clients
+    /Prompts                   — [McpServerPromptType] / [McpServerPrompt] attributes
+    /Prompts/Content           — prompt template files (markdown)
+    /Providers                 — prompt providers (load prompts from embedded resources)
+    /Resources                 — [McpServerResourceType] / [McpServerResource] attributes
+    /Services                  — orchestration layer (no MCP or HTTP concerns)
+    /Settings                  — strongly-typed configuration (API base URL, API key)
+    /Tools                     — [McpServerToolType] / [McpServerTool] attributes
     Dockerfile
 docker-compose.yml           — api, db, mcp services
 .env                         — secrets injected into containers (git-ignored)
@@ -127,7 +131,16 @@ All endpoints require a valid API key in the `X-Api-Key` header via a custom ASP
 | PUT    | /api/tasks/{id} | Update a task            |
 | DELETE | /api/tasks/{id} | Delete a task            |
 
-Query filter parameters for `GET /api/tasks`: `statuses` (multi-value list, optional), `priority`, `dueDateFrom`, `dueDateTo` (all optional).
+#### Query Parameters (GET /api/tasks)
+
+All parameters are optional and can be combined:
+
+| Parameter    | Type                | Notes                           |
+|--------------|---------------------|---------------------------------|
+| `statuses`   | enum (multi-value)  | Filter by task status           |
+| `priority`   | enum (single value) | Filter by priority              |
+| `dueDateFrom`| DateOnly            | Inclusive; must be ≤ dueDateTo  |
+| `dueDateTo`  | DateOnly            | Inclusive; must be ≥ dueDateFrom|
 
 ---
 
@@ -140,17 +153,19 @@ Streamable HTTP transport, stateless mode. Bridges MCP clients to TaskManager.Ap
 ```
 MCP Client → Streamable HTTP (POST / SSE)
     ↓
-Tool / Resource                    — MCP surface: attribute binding, input parameter parsing
+Tool / Resource / Prompt            — MCP surface: attribute binding, input parameter parsing
     ↓
-Service                            — orchestration: Dto ↔ Output mapping, business logic
+Service                             — orchestration: calls Collaborator (Tools/Resources) or PromptProvider (Prompts)
+    ├─ Tool/Resource path:
+    │   ├─ Collaborator              — typed HttpClient; X-Api-Key set once at DI registration
+    │   ├─ HttpClient → TaskManager.Api (REST) → returns Dto
+    │   └─ Mapper (Dto → Output)    — TaskItemMappingExtensions converts to output types
+    │
+    └─ Prompt path:
+        ├─ PromptProvider            — loads prompt content from embedded resources
+        └─ generates Output          — structured prompt text with schema
     ↓
-Collaborator                       — typed HttpClient; X-Api-Key set once at DI registration
-    ↓
-HttpClient → TaskManager.Api (REST) → returns Dto
-    ↓
-Mapper (Dto → Output)             — TaskItemMappingExtensions converts collaborator DTOs to output types
-    ↓
-Tool / Resource returns Output    — MCP client receives Output types
+Tool / Resource / Prompt returns Output    — MCP client receives Output types
 ```
 
 ### Types and Flow

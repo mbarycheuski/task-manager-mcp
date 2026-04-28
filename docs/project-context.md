@@ -21,16 +21,27 @@ A single-user task management system consisting of two components, both C# .NET 
 | API Client (MCP) | `IHttpClientFactory` typed client (HttpClient)    |
 | Infrastructure   | Docker / Docker Compose                           |
 
-## Business Requirements
+## MCP Server Context
 
-- Create a task with a title (required), optional notes, priority, and due date
-- Status lifecycle: `None → InProgress → Completed`; `InProgress` can revert to `None`, but `Completed` is terminal (no transitions out)
-- Completed tasks are immutable — they can only be deleted, not updated
-- Completing a task records `CompletedAt`
-- `CreatedAt` and `UpdatedAt` are set automatically
-- Any task can be deleted, regardless of status
+The **TaskManager.Mcp** server implements the [Model Context Protocol](https://modelcontextprotocol.io) (MCP), enabling LLM clients (like Claude) to interact with tasks as a native capability. Rather than prompting users to manually call HTTP endpoints, the MCP server provides tools, resources, and prompts that LLMs can use directly in conversations.
 
-## Business Rules
+- **Tools** — MCP operations (add, update, delete, get tasks) callable by the LLM
+- **Resources** — queryable task views (today's tasks, completed, in-progress, etc.)
+- **Prompts** — LLM-optimized summaries (daily plan, prioritization suggestions)
+
+The MCP server is a stateless HTTP bridge: it receives MCP requests, translates them to TaskManager.Api REST calls, and returns structured responses to the LLM client.
+
+## Core Concepts
+
+A **task** has:
+- A title (required), optional notes, optional priority, optional due date
+- A status with a defined lifecycle: `None → InProgress → Completed` (one-way; `InProgress` can revert to `None`, but `Completed` is terminal)
+- Automatic timestamps: `CreatedAt`, `UpdatedAt` (refreshed on change), and `CompletedAt` (set only when transitioning to `Completed`)
+- Immutability when `Completed` — completed tasks can only be deleted, never updated
+
+Any task can be deleted, regardless of status.
+
+## API Specification
 
 ### Create (`POST /api/tasks`)
 
