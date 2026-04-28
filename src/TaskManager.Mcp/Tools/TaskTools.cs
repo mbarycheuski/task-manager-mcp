@@ -109,8 +109,7 @@ public class TaskTools(ITaskService taskService)
     public Task<TaskItemOutput> UpdateTaskAsync(
         [Description("The task ID (UUID)")] Guid id,
         [Description("Updated task title (required)")] string title,
-        [Description("Updated status: None, InProgress, or Completed (required)")]
-            Outputs.TaskItemStatus status,
+        [Description("Updated status: None, InProgress, or Completed (required)")] string status,
         [Description("Updated task notes (optional)")] string? notes = null,
         [Description("Updated priority: Low, Medium, High, or Critical (optional)")]
             Outputs.TaskPriority? priority = null,
@@ -140,10 +139,18 @@ public class TaskTools(ITaskService taskService)
         if (priority.HasValue && !Enum.IsDefined(priority.Value))
             throw new ValidationException("Priority is not a valid value.");
 
-        if (!Enum.IsDefined(status))
+        if (
+            string.IsNullOrWhiteSpace(status)
+            || !Enum.TryParse<Outputs.TaskItemStatus>(
+                status,
+                ignoreCase: true,
+                out var parsedStatus
+            )
+            || !Enum.IsDefined(parsedStatus)
+        )
             throw new ValidationException("Status is not a valid value.");
 
-        var input = new UpdateTaskInput(title, notes, priority, status, dueDate);
+        var input = new UpdateTaskInput(title, notes, priority, parsedStatus, dueDate);
 
         return taskService.UpdateAsync(id, input, cancellationToken);
     }

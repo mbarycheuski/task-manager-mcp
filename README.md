@@ -116,6 +116,20 @@ Register the server in your client configuration:
 - `daily-plan` — Suggests top 3 highest-priority tasks due on a given date; accepts an optional `date` argument (`yyyy-MM-dd`), defaults to today
 - `prioritize-tasks` — Analyzes open tasks and suggests a prioritized order
 
+## Testing
+
+Test scenarios for MCP tools are located in [tests/scenarios/tools/](tests/scenarios/tools/). Each tool has comprehensive test coverage including happy path and error cases.
+
+**Test Coverage:**
+- `add_task` — 14 scenarios (happy path + validation errors)
+- `delete_task` — 3 scenarios
+- `get_all_tasks` — 8 scenarios (filters, boundaries, empty results)
+- `get_task` — 8 scenarios (success, not found, idempotency)
+- `update_task` — 13 scenarios (field updates, status changes, validation)
+
+**Running Tests:**
+Ask Claude: `/run-scenarios` to execute all MCP tool test scenarios. The `run-scenarios` agent will execute all test cases and report pass/fail results.
+
 ## Example Usage
 
 > "Create a task to review the Q2 budget, mark it as high priority, due next week."

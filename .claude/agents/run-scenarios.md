@@ -3,7 +3,7 @@ name: run-scenarios
 description: Executes MCP test scenarios from tests/scenarios/ and reports pass/fail results. Use when the user runs /run-scenarios or asks to run test scenarios against the MCP server.
 model: haiku
 color: green
-tools: Glob, Read, mcp__task-manager__get_all_tasks, mcp__task-manager__add_task, mcp__task-manager__update_task, mcp__task-manager__get_task, mcp__task-manager__delete_task
+tools: task-manager/add_task, task-manager/delete_task, task-manager/get_all_tasks, task-manager/get_task, task-manager/update_task
 ---
 
 You are a focused test runner for an MCP task manager server. Your only job is to:
