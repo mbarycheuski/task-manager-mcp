@@ -61,9 +61,8 @@ Docker runs inside WSL. Use `run.ps1` from the repo root (requires a `.env` file
    - *TaskManager.Mcp*: add or update the tool/resource/prompt and propagate through Service → Collaborator.
 4. **Update docs** — if the change adds or modifies an endpoint or tool, update `docs/architecture.md`.
 5. **Verify**
-   - Run the following from `src/TaskManager.Api` and confirm both pass before reporting done:
+   - Build the solution and confirm it passes before reporting done:
      ```bash
-     dotnet build TaskManager.Api.csproj
-     dotnet test TaskManager.Api.csproj
+     dotnet build src/TaskManager.slnx
      ```
 6. **Review** — run the `code-reviewer` agent after every change to verify consistency with project patterns, coding standards, and architectural conventions.

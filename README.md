@@ -71,7 +71,7 @@ Once containers are running:
 
 - **API Swagger UI**: http://localhost:8080/docs
 - **MCP Server**: http://localhost:5050
-- **MCP Inspector**: See the URL displayed by `run.ps1` (includes auth token)
+- **MCP Inspector**: http://localhost:6274?MCP_PROXY_AUTH_TOKEN= — run.ps1 generates the auth token
 - **Database**: PostgreSQL at `localhost:5432` (credentials from `.env`)
 
 ## MCP Integration
@@ -128,7 +128,7 @@ Test scenarios for MCP tools are located in [tests/scenarios/tools/](tests/scena
 - `update_task` — 13 scenarios (field updates, status changes, validation)
 
 **Running Tests:**
-Ask Claude: `/run-scenarios` to execute all MCP tool test scenarios. The `run-scenarios` agent will execute all test cases and report pass/fail results.
+Run `run-scenarios` agent to execute all MCP tool test scenarios. The `run-scenarios` agent will execute all test cases and report pass/fail results.
 
 ## Example Usage
 
@@ -140,6 +140,6 @@ Ask Claude: `/run-scenarios` to execute all MCP tool test scenarios. The `run-sc
 >
 > Claude uses the `get_all_tasks` tool filtered by `InProgress` status.
 
-> "What should I work on today?"
->
-> Claude uses the `daily-plan` prompt to suggest your top priority tasks for today.
+> Call `/mcp__task-manager__daily-plan` to get your top priority tasks for today.
+
+> Call `/mcp__task-manager__prioritize-tasks` to review all open tasks and get a prioritized order.
