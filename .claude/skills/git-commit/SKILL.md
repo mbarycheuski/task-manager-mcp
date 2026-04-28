@@ -85,5 +85,5 @@ feat(api): Add task priority filtering
 - Update TaskRepository to filter by priority
 - Add validation for priority enum values
 
-Co-Authored-By: Claude Opus 4.7 (https://github.com/claude)
+Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>
 ```
