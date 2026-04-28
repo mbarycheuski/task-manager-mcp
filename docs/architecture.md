@@ -184,7 +184,7 @@ Tool / Resource returns Output    — MCP client receives Output types
 
 | Prompt             | Description                                               | Status             |
 |--------------------|-----------------------------------------------------------|----------------|
-| `daily-plan`       | Top 3 highest-priority tasks due today                    | ✅ Implemented |
+| `daily-plan`       | Top 3 highest-priority tasks that are overdue or due today | ✅ Implemented |
 | `prioritize-tasks` | Reviews open tasks and suggests a prioritized order       | ✅ Implemented |
 
 

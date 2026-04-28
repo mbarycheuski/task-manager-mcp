@@ -12,17 +12,11 @@ public class TaskPrompts(IPromptService promptService, ITimeService timeService)
 {
     [McpServerPrompt(Name = "daily-plan")]
     [Description(
-        "Builds a daily planning prompt for the top 3 highest-priority tasks due on the given date (defaults to today)."
+        "Builds a daily planning prompt for the top 3 highest-priority tasks that are overdue or due today."
     )]
-    public async Task<ChatMessage> GetDailyPlanAsync(
-        [Description($"The date to plan for in {DateFormats.Default} format. Defaults to today.")]
-            string? date = null,
-        CancellationToken cancellationToken = default
-    )
+    public async Task<ChatMessage> GetDailyPlanAsync(CancellationToken cancellationToken = default)
     {
-        var planDate = DateOnly.TryParseExact(date, DateFormats.Default, out var parsed)
-            ? parsed
-            : timeService.GetTodayInDefaultTimezone();
+        var planDate = timeService.GetTodayInDefaultTimezone();
         var promptText = await promptService.GetDailyPlanAsync(planDate, cancellationToken);
 
         return new ChatMessage(ChatRole.User, promptText);
