@@ -113,8 +113,8 @@ Register the server in your client configuration:
 
 ### Available Prompts
 
-- `daily-plan` — Suggests top 3 highest-priority tasks due on a given date; accepts an optional `date` argument (`yyyy-MM-dd`), defaults to today
-- `prioritize-tasks` — Analyzes open tasks and suggests a prioritized order
+- `daily-plan` — Top 3 highest-priority tasks that are overdue or due today
+- `prioritize-tasks` — Reviews open tasks and suggests a prioritized order
 
 ## Testing
 
